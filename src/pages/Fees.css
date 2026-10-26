@@ -1,0 +1,293 @@
+.fees-page {
+  width: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  color: #172b4d;
+}
+
+.fees-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.fees-header h1 {
+  margin: 0 0 5px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.fees-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.fees-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fees-add-button,
+.fees-history-button,
+.fees-save-button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fees-add-button,
+.fees-save-button {
+  color: white;
+  background: #1670f8;
+}
+
+.fees-history-button {
+  color: #2159b8;
+  background: #eaf1ff;
+  border: 1px solid #d5e3ff;
+}
+
+.fees-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 20px 0 22px;
+}
+
+.fees-card {
+  padding: 18px;
+  background: white;
+  border: 1px solid #e4eaf2;
+  border-radius: 10px;
+  box-shadow: 0 2px 7px rgba(15, 23, 42, 0.04);
+}
+
+.fees-card span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.fees-card h2 {
+  margin: 9px 0 0;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.fees-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.fees-toolbar input {
+  width: 100%;
+  max-width: 440px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #d7e0eb;
+  border-radius: 7px;
+  box-sizing: border-box;
+}
+
+.fees-toolbar select {
+  width: 150px;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid #d7e0eb;
+  border-radius: 7px;
+  background: white;
+}
+
+.fees-table-container {
+  width: 100%;
+  overflow-x: auto;
+  background: white;
+  border: 1px solid #e4eaf2;
+  border-radius: 10px;
+}
+
+.fees-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.fees-table th,
+.fees-table td {
+  padding: 13px 14px;
+  text-align: left;
+  border-bottom: 1px solid #edf1f6;
+  font-size: 13px;
+}
+
+.fees-table th {
+  background: #f7f9fc;
+  color: #334155;
+  font-weight: 700;
+}
+
+.fees-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.fees-edit-button,
+.fees-delete-button {
+  padding: 7px 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fees-edit-button {
+  color: #1458c8;
+  background: #e5efff;
+}
+
+.fees-delete-button {
+  color: #c62828;
+  background: #fee2e2;
+}
+
+.fees-status {
+  padding: 4px 7px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.fees-status-paid {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.fees-status-partial {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.fees-status-pending {
+  color: #b45309;
+  background: #fef3c7;
+}
+
+.fees-form {
+  margin-bottom: 20px;
+  padding: 22px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.fees-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.fees-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.fees-form-grid input {
+  height: 40px;
+  padding: 0 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+}
+
+.fees-success,
+.fees-error {
+  padding: 11px 14px;
+  border-radius: 8px;
+}
+
+.fees-success {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.fees-error {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.fees-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  font-size: 12px;
+}
+
+.fees-pagination-buttons {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.fees-pagination button {
+  min-width: 30px;
+  height: 30px;
+  border: 1px solid #dbe3ed;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+.fees-pagination button.active {
+  color: white;
+  background: #1670f8;
+}
+
+@media (max-width: 900px) {
+  .fees-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .fees-page {
+    padding: 15px;
+  }
+
+  .fees-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .fees-header-actions {
+    flex-wrap: wrap;
+  }
+
+  .fees-toolbar,
+  .fees-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .fees-toolbar input,
+  .fees-toolbar select {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .fees-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
