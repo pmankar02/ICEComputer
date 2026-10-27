@@ -6,5 +6,6 @@ export interface Student {
   admissionDate: string;
   status: "Active" | "Inactive";
   gender: Gender;
+  photoUrl?: string | null;
 }
 export type Gender = "Male" | "Female" | "Other";

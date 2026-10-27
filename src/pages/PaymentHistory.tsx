@@ -1,10 +1,12 @@
-
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./PaymentHistory.css";
 
 interface Payment {
   id: number;
   studentFeeId: number;
+  studentId: number;
+  studentName: string;
+  course: string;
   amountPaid: number;
   paymentDate: string;
   paymentMode: string;
@@ -14,236 +16,181 @@ interface Payment {
 const API_URL = "http://localhost:5056/api/FeePayments";
 
 export default function PaymentHistory() {
-  const [feeId, setFeeId] = useState("");
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [amount, setAmount] = useState("");
-  const [mode, setMode] = useState("Cash");
-  const [notes, setNotes] = useState("");
+  const [search, setSearch] = useState("");
+  const [mode, setMode] = useState("All");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
 
-  async function loadPayments() {
-    if (!feeId || Number(feeId) <= 0) {
-      setError("Enter a valid Fee ID.");
-      return;
-    }
+  useEffect(() => {
+    async function loadPayments() {
+      setLoading(true);
+      setError("");
 
-    setLoading(true);
-    setError("");
-    setMessage("");
+      try {
+        const response = await fetch(`${API_URL}/all`);
+        if (!response.ok) throw new Error("Unable to load payment records.");
 
-    try {
-      const response = await fetch(`${API_URL}/fee/${feeId}`);
-
-      if (!response.ok) {
-        throw new Error(await response.text() || "Unable to load payment history.");
+        const data: Payment[] = await response.json();
+        setPayments(data);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Unable to load payments."
+        );
+      } finally {
+        setLoading(false);
       }
-
-      const data: Payment[] = await response.json();
-      setPayments(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to load payments.");
-    } finally {
-      setLoading(false);
     }
+
+    void loadPayments();
+  }, []);
+
+  const filteredPayments = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    return payments.filter((p) => {
+      const matchesSearch =
+        !query ||
+        (p.studentName ?? "").toLowerCase().includes(query) ||
+        (p.course ?? "").toLowerCase().includes(query) ||
+        String(p.studentId).includes(query) ||
+        String(p.studentFeeId).includes(query) ||
+        String(p.id).includes(query);
+
+      const matchesMode = mode === "All" || p.paymentMode === mode;
+      const date = p.paymentDate?.slice(0, 10) ?? "";
+      const matchesFrom = !fromDate || date >= fromDate;
+      const matchesTo = !toDate || date <= toDate;
+
+      return matchesSearch && matchesMode && matchesFrom && matchesTo;
+    });
+  }, [payments, search, mode, fromDate, toDate]);
+
+  function clearFilters() {
+    setSearch("");
+    setMode("All");
+    setFromDate("");
+    setToDate("");
   }
 
-  async function addPayment(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError("");
-    setMessage("");
+  return (
+    <div className="payment-history-page">
+      {error && <div className="payment-alert error-message">{error}</div>}
 
-    const paymentAmount = Number(amount);
-
-    if (!feeId || Number(feeId) <= 0 || !Number.isFinite(paymentAmount) || paymentAmount <= 0) {
-      setError("Enter a valid Fee ID and payment amount.");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          studentFeeId: Number(feeId),
-          amountPaid: paymentAmount,
-          paymentMode: mode,
-          notes: notes.trim() || null,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(await response.text() || "Unable to save payment.");
-      }
-
-      setMessage("Payment saved successfully!");
-      setAmount("");
-      setNotes("");
-      await loadPayments();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to save payment.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
- 
-return (
-  <div className="payment-history-page">
-    <div className="payment-page-header">
-      <div>
-        <h1>Payment History</h1>
+      <div className="payment-card">
+        <h2>All Payment Records</h2>
         <p className="page-description">
-          Manage and track student fee payments.
+          Search and filter transactions across all students.
         </p>
-      </div>
-    </div>
 
-    <div className="payment-card">
-      <h2>Load Payment History</h2>
+        <p>{filteredPayments.length} of {payments.length} records</p>
 
-      <form
-        className="payment-form"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void loadPayments();
-        }}
-      >
-        <div className="payment-field">
-          <label htmlFor="feeId">Fee ID</label>
-          <input
-            id="feeId"
-            type="number"
-            min="1"
-            value={feeId}
-            onChange={(event) => setFeeId(event.target.value)}
-            placeholder="Enter Fee ID"
-            required
-          />
-        </div>
+        <div className="payment-filters">
+          <div className="payment-field">
+            <label htmlFor="paymentSearch">Search</label>
+            <input
+              id="paymentSearch"
+              type="search"
+              placeholder="Student name, ID, course"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Loading..." : "Load History"}
-        </button>
-      </form>
-    </div>
+          <div className="payment-field">
+            <label htmlFor="paymentMode">Payment Mode</label>
+            <select
+              id="paymentMode"
+              value={mode}
+              onChange={(e) => setMode(e.target.value)}
+            >
+              <option value="All">All Modes</option>
+              <option value="Cash">Cash</option>
+              <option value="UPI">UPI</option>
+              <option value="Card">Card</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+          </div>
 
-    <div className="payment-card">
-      <h2>Add Payment</h2>
+          <div className="payment-field">
+            <label htmlFor="fromDate">From Date</label>
+            <input
+              id="fromDate"
+              type="date"
+              value={fromDate}
+              max={toDate || undefined}
+              onChange={(e) => setFromDate(e.target.value)}
+            />
+          </div>
 
-      <form onSubmit={addPayment} className="payment-form">
-        <div className="payment-field">
-          <label htmlFor="amount">Amount (₹)</label>
-          <input
-            id="amount"
-            type="number"
-            min="0.01"
-            step="0.01"
-            value={amount}
-            onChange={(event) => setAmount(event.target.value)}
-            placeholder="Enter amount"
-            required
-          />
-        </div>
+          <div className="payment-field">
+            <label htmlFor="toDate">To Date</label>
+            <input
+              id="toDate"
+              type="date"
+              value={toDate}
+              min={fromDate || undefined}
+              onChange={(e) => setToDate(e.target.value)}
+            />
+          </div>
 
-        <div className="payment-field">
-          <label htmlFor="mode">Payment Mode</label>
-          <select
-            id="mode"
-            value={mode}
-            onChange={(event) => setMode(event.target.value)}
-          >
-            <option value="Cash">Cash</option>
-            <option value="UPI">UPI</option>
-            <option value="Card">Card</option>
-            <option value="Bank Transfer">Bank Transfer</option>
-          </select>
-        </div>
-
-        <div className="payment-field">
-          <label htmlFor="notes">Notes</label>
-          <input
-            id="notes"
-            type="text"
-            maxLength={250}
-            value={notes}
-            onChange={(event) => setNotes(event.target.value)}
-            placeholder="Optional notes"
-          />
-        </div>
-
-        <div className="payment-form-action">
-          <button type="submit" disabled={loading}>
-            {loading ? "Saving..." : "Save Payment"}
+          <button type="button" onClick={clearFilters}>
+            Clear Filters
           </button>
         </div>
-      </form>
-    </div>
 
-    {message && <div className="payment-alert success-message">{message}</div>}
-    {error && <div className="payment-alert error-message">{error}</div>}
-
-    <div className="payment-card">
-      <div className="payment-records-header">
-        <div>
-          <h2>Payment Records</h2>
-          <p className="page-description">
-            View recorded transactions for the selected fee.
-          </p>
-        </div>
-        <span className="payment-count">
-          {payments.length} Records
-        </span>
-      </div>
-
-      <div className="payment-table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Payment ID</th>
-              <th>Fee ID</th>
-              <th>Amount</th>
-              <th>Payment Date</th>
-              <th>Payment Mode</th>
-              <th>Notes</th>
-            </tr>
-          </thead>
-          <tbody>
-            {payments.length === 0 ? (
+        <div className="payment-table-wrapper">
+          <table>
+            <thead>
               <tr>
-                <td colSpan={6} className="payment-empty">
-                  {loading
-                    ? "Loading payment records..."
-                    : "No payment records loaded. Enter a Fee ID and click Load History."}
-                </td>
+                <th>Payment ID</th>
+                <th>Student Name</th>
+                <th>Course</th>
+                <th>Fee ID</th>
+                <th>Amount</th>
+                <th>Payment Date</th>
+                <th>Payment Mode</th>
+                <th>Notes</th>
               </tr>
-            ) : (
-              payments.map((payment) => (
-                <tr key={payment.id}>
-                  <td>#{payment.id}</td>
-                  <td>{payment.studentFeeId}</td>
-                  <td className="payment-amount">
-                    ₹{payment.amountPaid.toLocaleString("en-IN")}
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={8} className="payment-empty">
+                    Loading payment records...
                   </td>
-                  <td>
-                    {new Date(payment.paymentDate).toLocaleString("en-IN")}
-                  </td>
-                  <td>
-                    <span className="payment-mode-badge">
-                      {payment.paymentMode}
-                    </span>
-                  </td>
-                  <td>{payment.notes || "-"}</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : filteredPayments.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="payment-empty">
+                    No payment records found.
+                  </td>
+                </tr>
+              ) : (
+                filteredPayments.map((p) => (
+                  <tr key={p.id}>
+                    <td>#{p.id}</td>
+                    <td>{p.studentName || "Unknown Student"}</td>
+                    <td>{p.course || "-"}</td>
+                    <td>{p.studentFeeId}</td>
+                    <td>
+                      ₹{p.amountPaid.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                    <td>{new Date(p.paymentDate).toLocaleString("en-IN")}</td>
+                    <td>{p.paymentMode}</td>
+                    <td>{p.notes || "-"}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 }

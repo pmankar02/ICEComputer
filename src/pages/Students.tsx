@@ -23,6 +23,7 @@ function Students() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null); 
 
   const [search, setSearch] = useState("");
+  const [photo, setPhoto] = useState<File | null>(null);
   
     useEffect(() => {
         setPage(1);
@@ -140,6 +141,9 @@ async function handleSubmit(
     } else {
       await addStudent(studentData);
     }
+
+    
+    
 
     const updatedStudents = await getStudents();
     setStudents(updatedStudents);
@@ -300,6 +304,14 @@ async function handleDelete(student: Student) {
                 <option>Advanced Excel</option>
               </select>
             </label>
+            <label>
+              Student Photo
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
+              />
+            </label>
 
             <label>
               Status
@@ -373,7 +385,22 @@ async function handleDelete(student: Student) {
               {visibleStudents.map((student, index) => (
                 <tr key={student.id}>
                   <td>{(currentPage - 1) * pageSize + index + 1}</td>
-                  <td className="student-name">{student.name}</td>
+                  <td className="student-name">
+                    <div className="student-name-cell">
+                      {student.photoUrl ? (
+                        <img
+                          src={`http://localhost:5056${student.photoUrl}`}
+                          alt={student.name}
+                          className="student-photo"
+                        />
+                      ) : (
+                        <div className="student-photo-placeholder">
+                          <i className="bi bi-person-fill"></i>
+                        </div>
+                      )}
+                      <span>{student.name}</span>
+                    </div>
+                  </td>
                   <td>{student.mobile}</td>
                   <td>{student.course}</td>
                   <td>{student.gender}</td>
