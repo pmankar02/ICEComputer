@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import "./Fees.css";
 
+interface StudentOption {
+  id: number;
+  name: string;
+  mobile?: string;
+  course?: string;
+}
+
 interface Fee {
   id: number;
   studentId: number;
@@ -16,6 +23,7 @@ const API_URL = "http://localhost:5056/api/StudentFees";
 
 export default function Fees() {
   const [fees, setFees] = useState<Fee[]>([]);
+  const [students, setStudents] = useState<StudentOption[]>([]);
   const [studentId, setStudentId] = useState("");
   const [totalFees, setTotalFees] = useState("");
   const [paidFees, setPaidFees] = useState("");
@@ -47,8 +55,33 @@ export default function Fees() {
   }
 
   useEffect(() => {
-    void loadFees();
-  }, []);
+  void loadFees();
+
+  async function loadStudents() {
+    try {
+      const response = await fetch("http://localhost:5056/api/students");
+
+      if (!response.ok) {
+        throw new Error("Unable to load students.");
+      }
+
+      const data = await response.json();
+
+      setStudents(
+        data.map((student: any) => ({
+          id: student.id ?? student.Id,
+          name: student.name ?? student.Name ?? "",
+          mobile: student.mobile ?? student.Mobile ?? "",
+          course: student.course ?? student.Course ?? "",
+        }))
+      );
+    } catch (err) {
+      console.error("Failed to load students:", err);
+    }
+  }
+
+  void loadStudents();
+}, []);
 
   function resetForm() {
     setStudentId("");
@@ -231,16 +264,23 @@ export default function Fees() {
           <h2>{editingId !== null ? "Edit Fee Record" : "Collect Fee"}</h2>
 
           <div className="fees-form-grid">
-            <label>
-              Student ID
-              <input
-                type="number"
-                min="1"
-                step="1"
+           <label>
+              Student Name
+              <select
+                className="student-select"
                 value={studentId}
                 onChange={(event) => setStudentId(event.target.value)}
                 required
-              />
+              >
+                <option value="">Select Student</option>
+
+                {students.map((student) => (
+                  <option key={student.id} value={student.id}>
+                    {student.name} — ID: {student.id}
+                    {student.course ? ` (${student.course})` : ""}
+                  </option>
+                ))}
+              </select>
             </label>
 
             <label>

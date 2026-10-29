@@ -19,6 +19,8 @@ interface ApiStudent {
   Status?: string;
   isActive?: boolean;
   IsActive?: boolean;
+  photoUrl?: string | null;
+  PhotoUrl?: string | null;
 }
 
 export interface StudentInput {
@@ -67,6 +69,7 @@ export async function getStudents(): Promise<Student[]> {
         rawStatus?.toLowerCase() === "inactive" || active === false
           ? "Inactive"
           : "Active",
+          photoUrl: item.photoUrl ?? item.PhotoUrl ?? null,
     };
   });
 }

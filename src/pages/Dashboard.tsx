@@ -1,7 +1,14 @@
 
 import "./Dashboard.css";
 import { useEffect, useState } from "react";
-
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
 
 const activities = [
@@ -53,6 +60,21 @@ function Dashboard() {
   const [activeStudents, setActiveStudents] = useState(0);
   const [inactiveStudents, setInactiveStudents] = useState(0);
   const [newAdmissions, setNewAdmissions] = useState(0);
+  const [todaysCollection, setTodaysCollection] = useState(0);
+  const [pendingFees, setPendingFees] = useState(0);
+  const [recentPayments, setRecentPayments] = useState<
+  {
+    id: number;
+    studentName: string;
+    amountPaid: number;
+    paymentDate: string;
+    paymentMode: string;
+    course: string;
+  }[]
+>([]);
+  const [courseDistribution, setCourseDistribution] = useState<
+  { name: string; value: number }[]
+>([]);
 
   useEffect(() => {
     async function loadStudentCount() {
@@ -65,7 +87,107 @@ function Dashboard() {
           throw new Error("Failed to load students");
         }
 
-        const students = await response.json();
+      const students: {
+  course?: string;
+  Course?: string;
+  admissionDate?: string;
+  AdmissionDate?: string;
+  status?: string;
+  isActive?: boolean;
+  IsActive?: boolean;
+}[] = await response.json();
+
+const courseCounts: Record<string, number> = {};
+
+students.forEach((student) => {
+  const course = student.course ?? student.Course ?? "Other";
+  courseCounts[course] = (courseCounts[course] ?? 0) + 1;
+});
+
+const distribution = Object.keys(courseCounts).map((name) => ({
+  name,
+  value: courseCounts[name],
+}));
+
+const paymentResponse = await fetch(
+  "http://localhost:5056/api/FeePayments/all"
+);
+
+if (!paymentResponse.ok) {
+  throw new Error("Failed to load payments");
+}
+
+const payments: {
+  amountPaid?: number;
+  AmountPaid?: number;
+  paymentDate?: string;
+  PaymentDate?: string;
+}[] = await paymentResponse.json();
+
+const today = new Date();
+
+const todaysTotal = payments.reduce((total, payment) => {
+  const dateValue = payment.paymentDate ?? payment.PaymentDate;
+  const amount = payment.amountPaid ?? payment.AmountPaid ?? 0;
+
+  if (!dateValue) return total;
+
+  const paymentDate = new Date(dateValue);
+
+  const isToday =
+    paymentDate.getDate() === today.getDate() &&
+    paymentDate.getMonth() === today.getMonth() &&
+    paymentDate.getFullYear() === today.getFullYear();
+
+  return isToday ? total + amount : total;
+}, 0);
+
+setTodaysCollection(todaysTotal);
+
+const feeResponse = await fetch(
+  "http://localhost:5056/api/StudentFees"
+);
+
+if (!feeResponse.ok) {
+  throw new Error("Unable to load fee records");
+}
+
+const feeRecords: {
+  remainingFees?: number;
+  RemainingFees?: number;
+  totalFees?: number;
+  TotalFees?: number;
+  paidFees?: number;
+  PaidFees?: number;
+}[] = await feeResponse.json();
+
+const totalPending = feeRecords.reduce((total, fee) => {
+  const remaining =
+    fee.remainingFees ??
+    fee.RemainingFees ??
+    ((fee.totalFees ?? fee.TotalFees ?? 0) -
+      (fee.paidFees ?? fee.PaidFees ?? 0));
+
+  return total + Math.max(0, remaining);
+}, 0);
+
+setPendingFees(totalPending);
+
+setRecentPayments(
+  payments
+    .map((payment: any) => ({
+      id: payment.id ?? payment.Id,
+      studentName: payment.studentName ?? payment.StudentName ?? "Unknown",
+      amountPaid: payment.amountPaid ?? payment.AmountPaid ?? 0,
+      paymentDate: payment.paymentDate ?? payment.PaymentDate ?? "",
+      paymentMode: payment.paymentMode ?? payment.PaymentMode ?? "-",
+      course: payment.course ?? payment.Course ?? "-",
+    }))
+    .slice(0, 5)
+);
+
+setCourseDistribution(distribution);
+        
         setTotalStudents(students.length);
         setNewAdmissions(
     students.filter((student: { admissionDate?: string; AdmissionDate?: string }) => {
@@ -137,14 +259,17 @@ setInactiveStudents(
       },
       {
         title: "Today's Collection",
-        value: "₹8,500",
+        value: `₹${todaysCollection.toLocaleString("en-IN")}`,
         icon: "bi-cash-stack",
         color: "orange",
         note: "Today's payments",
       },
       {
         title: "Pending Fees",
-        value: "₹42,000",
+       value: `₹${pendingFees.toLocaleString("en-IN", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
         icon: "bi-wallet2",
         color: "pink",
         note: "Outstanding balance",
@@ -310,30 +435,108 @@ setInactiveStudents(
             </div>
           </article>
 
-          <article className="panel activities-panel">
+          <article className="panel course-distribution-panel">
             <div className="panel-header">
               <div>
-                <h3>Recent Activities</h3>
-                <p>Latest updates from your institute</p>
+                <h3>Student Course Distribution</h3>
+                <p>Students enrolled in each course</p>
               </div>
             </div>
 
-            <div className="activity-list">
-              {activities.map((activity) => (
-                <div className="activity-item" key={activity.title}>
-                  <div className={`activity-icon ${activity.color}`}>
-                    <i className={`bi ${activity.icon}`}></i>
+              <div style={{ width: "100%", height: 220 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={courseDistribution}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={45}
+                    outerRadius={70}
+                    paddingAngle={3}
+                  >
+                    {courseDistribution.map((_, index) => (
+                      <Cell
+                        key={index}
+                        fill={[
+                          "#2684FF",
+                          "#24B47E",
+                          "#FF9F43",
+                          "#9B59B6",
+                          "#F45B69",
+                          "#16B8C8",
+                        ][index % 6]}
+                      />
+                    ))}
+                  </Pie>
+                  <text
+                    x="50%"
+                    y="40%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    style={{ fontSize: 24, fontWeight: 700, fill: "#1e293b" }}
+                  >
+                    {totalStudents}
+                  </text>
+
+                  <text
+                    x="50%"
+                    y="48%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    style={{ fontSize: 11, fill: "#64748b" }}
+                  >
+                    Students
+                  </text>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </article>
+
+         
+          <article className="panel activities-panel">
+          <div className="panel-header">
+            <div>
+              <h3>Recent Payments</h3>
+              <p>Latest fee transactions</p>
+            </div>
+          </div>
+
+          <div className="activity-list">
+            {recentPayments.length === 0 ? (
+              <p>No payment records found.</p>
+            ) : (
+              recentPayments.map((payment) => (
+                <div className="activity-item" key={payment.id}>
+                  <div className="activity-icon green">
+                    <i className="bi bi-cash-stack"></i>
                   </div>
 
                   <div className="activity-details">
-                    <strong>{activity.title}</strong>
-                    <p>{activity.description}</p>
-                    <small>{activity.time}</small>
+                    <strong>{payment.studentName}</strong>
+                    <p>
+                      ₹
+                      {payment.amountPaid.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}{" "}
+                      · {payment.course}
+                    </p>
+                    <small>
+                      {payment.paymentDate
+                        ? new Date(payment.paymentDate).toLocaleString("en-IN")
+                        : "-"}{" "}
+                      · {payment.paymentMode}
+                    </small>
                   </div>
                 </div>
-              ))}
-            </div>
-          </article>
+              ))
+            )}
+          </div>
+        </article>
         </section>
 
         <footer className="dashboard-footer">

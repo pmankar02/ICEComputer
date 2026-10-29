@@ -24,7 +24,7 @@ function Students() {
 
   const [search, setSearch] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
-  
+  const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
     useEffect(() => {
         setPage(1);
     }, [search]);
@@ -136,19 +136,43 @@ async function handleSubmit(
   };
 
   try {
+    let savedStudentId = editingId;
+
     if (editingId !== null) {
       await updateStudent(editingId, studentData);
     } else {
       await addStudent(studentData);
+
+      const savedStudents = await getStudents();
+      const savedStudent = savedStudents.find(
+        (s) => s.mobile === mobile
+      );
+
+      savedStudentId = savedStudent?.id ?? null;
     }
 
-    
-    
+    if (photo && savedStudentId !== null) {
+      const formData = new FormData();
+      formData.append("photo", photo);
+
+      const response = await fetch(
+        `http://localhost:5056/api/students/${savedStudentId}/photo`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Student saved, but photo upload failed.");
+      }
+    }
 
     const updatedStudents = await getStudents();
     setStudents(updatedStudents);
     setPage(1);
     resetForm();
+
     alert("Student saved successfully!");
   } catch (error) {
     alert(
@@ -198,6 +222,17 @@ async function handleDelete(student: Student) {
   <div className="student-modal-overlay">
     <div className="student-modal">
       <h2>Student Details</h2>
+      {selectedStudent.photoUrl ? (
+        <img
+          src={`http://localhost:5056${selectedStudent.photoUrl}`}
+          alt={selectedStudent.name}
+          className="student-details-photo"
+        />
+      ) : (
+        <div className="student-details-photo-placeholder">
+          <i className="bi bi-person-fill"></i>
+        </div>
+      )}
       <p><strong>Student ID:</strong> {selectedStudent.id}</p>
       <p><strong>Name:</strong> {selectedStudent.name}</p>
       <p><strong>Gender:</strong> {selectedStudent.gender}</p>
@@ -213,6 +248,31 @@ async function handleDelete(student: Student) {
       >
         Close
       </button>
+    </div>
+  </div>
+)}
+{previewPhoto && (
+  <div
+    className="photo-modal-overlay"
+    onClick={() => setPreviewPhoto(null)}
+  >
+    <div
+      className="photo-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        type="button"
+        className="photo-modal-close"
+        onClick={() => setPreviewPhoto(null)}
+      >
+        ×
+      </button>
+
+      <img
+        src={`http://localhost:5056${previewPhoto}`}
+        alt="Student preview"
+        className="photo-modal-image"
+      />
     </div>
   </div>
 )}
@@ -387,17 +447,20 @@ async function handleDelete(student: Student) {
                   <td>{(currentPage - 1) * pageSize + index + 1}</td>
                   <td className="student-name">
                     <div className="student-name-cell">
-                      {student.photoUrl ? (
-                        <img
-                          src={`http://localhost:5056${student.photoUrl}`}
-                          alt={student.name}
-                          className="student-photo"
-                        />
-                      ) : (
-                        <div className="student-photo-placeholder">
-                          <i className="bi bi-person-fill"></i>
-                        </div>
-                      )}
+                     {student.photoUrl ? (
+                      <img
+                        src={`http://localhost:5056${student.photoUrl}`}
+                        alt={student.name}
+                        className="student-photo"
+                        title="Click to view photo"
+                        onClick={() => setPreviewPhoto(student.photoUrl ?? null)}
+                        style={{ cursor: "pointer" }}
+                      />
+                    ) : (
+                      <div className="student-photo-placeholder">
+                        <i className="bi bi-person-fill"></i>
+                      </div>
+                    )}
                       <span>{student.name}</span>
                     </div>
                   </td>
