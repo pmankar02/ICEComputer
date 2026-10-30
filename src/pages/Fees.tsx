@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./Fees.css";
+import { useNavigate } from "react-router-dom";
 
 interface StudentOption {
   id: number;
@@ -36,7 +37,8 @@ export default function Fees() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+  const navigate = useNavigate();
+  const pageSize = 10;
 
   async function loadFees() {
     setLoading(true);
@@ -230,9 +232,7 @@ export default function Fees() {
           <button
             type="button"
             className="fees-history-button"
-            onClick={() => {
-              window.location.hash = "/payment-history";
-            }}
+            onClick={() => navigate("/payment-history")}
           >
             Payment History
           </button>

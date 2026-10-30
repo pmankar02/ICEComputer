@@ -1,195 +1,176 @@
+
 import { useEffect, useMemo, useState } from "react";
 import "./PaymentHistory.css";
+import { useNavigate } from "react-router-dom";
 
 interface Payment {
   id: number;
   studentFeeId: number;
-  studentId: number;
   studentName: string;
-  course: string;
   amountPaid: number;
   paymentDate: string;
-  paymentMode: string;
-  notes?: string | null;
 }
 
-const API_URL = "http://localhost:5056/api/FeePayments";
+interface Fee {
+  id: number;
+  studentId: number;
+  studentName: string;
+  totalFees: number;
+  paidFees: number;
+  remainingFees: number;
+}
+
+interface PaymentHistoryRow extends Payment {
+  totalFees: number;
+  paidFees: number;
+  pendingFees: number;
+}
+
+const PAYMENT_API = "http://localhost:5056/api/FeePayments/all";
+const FEES_API = "http://localhost:5056/api/StudentFees";
 
 export default function PaymentHistory() {
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [fees, setFees] = useState<Fee[]>([]);
   const [search, setSearch] = useState("");
-  const [mode, setMode] = useState("All");
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const navigate = useNavigate();
   useEffect(() => {
-    async function loadPayments() {
+    async function loadHistory() {
       setLoading(true);
       setError("");
 
       try {
-        const response = await fetch(`${API_URL}/all`);
-        if (!response.ok) throw new Error("Unable to load payment records.");
+        const [paymentResponse, feeResponse] = await Promise.all([
+          fetch(PAYMENT_API),
+          fetch(FEES_API),
+        ]);
 
-        const data: Payment[] = await response.json();
-        setPayments(data);
+        if (!paymentResponse.ok || !feeResponse.ok) {
+          throw new Error("Unable to load payment history.");
+        }
+
+        const paymentData: Payment[] = await paymentResponse.json();
+        const feeData: Fee[] = await feeResponse.json();
+
+        setPayments(paymentData);
+        setFees(feeData);
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Unable to load payments."
+          err instanceof Error
+            ? err.message
+            : "Unable to load payment history."
         );
       } finally {
         setLoading(false);
       }
     }
 
-    void loadPayments();
+    void loadHistory();
   }, []);
 
-  const filteredPayments = useMemo(() => {
+  const history = useMemo<PaymentHistoryRow[]>(() => {
+    return payments.map((payment) => {
+      const fee = fees.find((item) => item.id === payment.studentFeeId);
+
+      return {
+        ...payment,
+        totalFees: fee?.totalFees ?? 0,
+        paidFees: fee?.paidFees ?? 0,
+        pendingFees: fee?.remainingFees ?? 0,
+      };
+    });
+  }, [payments, fees]);
+
+  const filteredHistory = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return payments.filter((p) => {
-      const matchesSearch =
-        !query ||
-        (p.studentName ?? "").toLowerCase().includes(query) ||
-        (p.course ?? "").toLowerCase().includes(query) ||
-        String(p.studentId).includes(query) ||
-        String(p.studentFeeId).includes(query) ||
-        String(p.id).includes(query);
+    return history.filter((item) =>
+      (item.studentName ?? "").toLowerCase().includes(query)
+    );
+  }, [history, search]);
 
-      const matchesMode = mode === "All" || p.paymentMode === mode;
-      const date = p.paymentDate?.slice(0, 10) ?? "";
-      const matchesFrom = !fromDate || date >= fromDate;
-      const matchesTo = !toDate || date <= toDate;
+  function formatCurrency(amount: number) {
+    return `₹${amount.toLocaleString("en-IN", {
+      maximumFractionDigits: 2,
+    })}`;
+  }
 
-      return matchesSearch && matchesMode && matchesFrom && matchesTo;
-    });
-  }, [payments, search, mode, fromDate, toDate]);
+  function formatDate(value: string) {
+    if (!value) return "-";
 
-  function clearFilters() {
-    setSearch("");
-    setMode("All");
-    setFromDate("");
-    setToDate("");
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) return "-";
+
+    return date.toLocaleDateString("en-IN");
   }
 
   return (
     <div className="payment-history-page">
-      {error && <div className="payment-alert error-message">{error}</div>}
-
+      <button
+        type="button"
+        className="payment-back-button"
+        onClick={() => navigate("/fees")}
+      >
+        ← Back to Fees
+      </button>
       <div className="payment-card">
-        <h2>All Payment Records</h2>
+        <h2>Payment History</h2>
         <p className="page-description">
-          Search and filter transactions across all students.
+          View student payments, fees paid and pending balances.
         </p>
 
-        <p>{filteredPayments.length} of {payments.length} records</p>
-
-        <div className="payment-filters">
-          <div className="payment-field">
-            <label htmlFor="paymentSearch">Search</label>
-            <input
-              id="paymentSearch"
-              type="search"
-              placeholder="Student name, ID, course"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-
-          <div className="payment-field">
-            <label htmlFor="paymentMode">Payment Mode</label>
-            <select
-              id="paymentMode"
-              value={mode}
-              onChange={(e) => setMode(e.target.value)}
-            >
-              <option value="All">All Modes</option>
-              <option value="Cash">Cash</option>
-              <option value="UPI">UPI</option>
-              <option value="Card">Card</option>
-              <option value="Bank Transfer">Bank Transfer</option>
-            </select>
-          </div>
-
-          <div className="payment-field">
-            <label htmlFor="fromDate">From Date</label>
-            <input
-              id="fromDate"
-              type="date"
-              value={fromDate}
-              max={toDate || undefined}
-              onChange={(e) => setFromDate(e.target.value)}
-            />
-          </div>
-
-          <div className="payment-field">
-            <label htmlFor="toDate">To Date</label>
-            <input
-              id="toDate"
-              type="date"
-              value={toDate}
-              min={fromDate || undefined}
-              onChange={(e) => setToDate(e.target.value)}
-            />
-          </div>
-
-          <button type="button" onClick={clearFilters}>
-            Clear Filters
-          </button>
+        <div className="payment-history-search">
+          <input
+            type="search"
+            placeholder="Search by student name..."
+            aria-label="Search by student name"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
         </div>
 
-        <div className="payment-table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Payment ID</th>
-                <th>Student Name</th>
-                <th>Course</th>
-                <th>Fee ID</th>
-                <th>Amount</th>
-                <th>Payment Date</th>
-                <th>Payment Mode</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
+        {error && <p className="error-message">{error}</p>}
+
+        {loading ? (
+          <p>Loading payment history...</p>
+        ) : (
+          <div className="payment-table-wrapper">
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan={8} className="payment-empty">
-                    Loading payment records...
-                  </td>
+                  <th>Student Name</th>
+                  <th>Date</th>
+                  <th>Total Fees</th>
+                  <th>Paid Fees</th>
+                  <th>Pending Fees</th>
                 </tr>
-              ) : filteredPayments.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="payment-empty">
-                    No payment records found.
-                  </td>
-                </tr>
-              ) : (
-                filteredPayments.map((p) => (
-                  <tr key={p.id}>
-                    <td>#{p.id}</td>
-                    <td>{p.studentName || "Unknown Student"}</td>
-                    <td>{p.course || "-"}</td>
-                    <td>{p.studentFeeId}</td>
-                    <td>
-                      ₹{p.amountPaid.toLocaleString("en-IN", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
+              </thead>
+
+              <tbody>
+                {filteredHistory.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="payment-empty">
+                      No payment history found.
                     </td>
-                    <td>{new Date(p.paymentDate).toLocaleString("en-IN")}</td>
-                    <td>{p.paymentMode}</td>
-                    <td>{p.notes || "-"}</td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ) : (
+                  filteredHistory.map((item) => (
+                    <tr key={item.id}>
+                      <td>{item.studentName || "Unknown Student"}</td>
+                      <td>{formatDate(item.paymentDate)}</td>
+                      <td>{formatCurrency(item.totalFees)}</td>
+                      <td>{formatCurrency(item.paidFees)}</td>
+                      <td>{formatCurrency(item.pendingFees)}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -66,10 +66,11 @@ function Dashboard() {
   {
     id: number;
     studentName: string;
+    course: string;
     amountPaid: number;
     paymentDate: string;
     paymentMode: string;
-    course: string;
+    notes: string | null;
   }[]
 >([]);
   const [courseDistribution, setCourseDistribution] = useState<
@@ -135,9 +136,9 @@ const todaysTotal = payments.reduce((total, payment) => {
   const paymentDate = new Date(dateValue);
 
   const isToday =
-    paymentDate.getDate() === today.getDate() &&
+    paymentDate.getFullYear() === today.getFullYear() &&
     paymentDate.getMonth() === today.getMonth() &&
-    paymentDate.getFullYear() === today.getFullYear();
+    paymentDate.getDate() === today.getDate();
 
   return isToday ? total + amount : total;
 }, 0);
@@ -178,11 +179,17 @@ setRecentPayments(
     .map((payment: any) => ({
       id: payment.id ?? payment.Id,
       studentName: payment.studentName ?? payment.StudentName ?? "Unknown",
+      course: payment.course ?? payment.Course ?? "-",
       amountPaid: payment.amountPaid ?? payment.AmountPaid ?? 0,
       paymentDate: payment.paymentDate ?? payment.PaymentDate ?? "",
       paymentMode: payment.paymentMode ?? payment.PaymentMode ?? "-",
-      course: payment.course ?? payment.Course ?? "-",
+      notes: payment.notes ?? payment.Notes ?? null,
     }))
+    .sort(
+      (a, b) =>
+        new Date(b.paymentDate).getTime() -
+        new Date(a.paymentDate).getTime()
+    )
     .slice(0, 5)
 );
 
