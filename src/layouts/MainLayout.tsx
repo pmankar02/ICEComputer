@@ -1,5 +1,5 @@
 
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import "./MainLayout.css";
 
 const menuItems = [
@@ -13,11 +13,26 @@ const menuItems = [
   { label: "Inventory", path: "/inventory", icon: "bi-box-seam" },
   { label: "Reports", path: "/reports", icon: "bi-bar-chart" },
   { label: "AI Assistant", path: "/ai-assistant", icon: "bi-robot" },
-  { label: "Users & Roles", path: "/users", icon: "bi-person-gear" },
+  { label: "Users & Roles", path: "/user-management", icon: "bi-person-gear" },
   { label: "Settings", path: "/settings", icon: "bi-gear" },
 ];
 
 function MainLayout() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    const confirmLogout = window.confirm(
+      "Are you sure you want to logout?"
+    );
+
+    if (!confirmLogout) return;
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    navigate("/login", { replace: true });
+  };
+
   return (
     <div className="app-layout">
       <aside className="app-sidebar">
@@ -43,8 +58,19 @@ function MainLayout() {
         </nav>
 
         <div className="app-sidebar-footer">
-          <span className="app-status-dot"></span>
-          System Online
+          <div className="app-system-status">
+            <span className="app-status-dot"></span>
+            System Online
+          </div>
+
+          <button
+            type="button"
+            className="app-logout-button"
+            onClick={handleLogout}
+          >
+            <i className="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+          </button>
         </div>
       </aside>
 

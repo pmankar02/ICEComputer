@@ -1,0 +1,396 @@
+
+/* User Management - Compact Professional UI */
+
+.user-management {
+  padding: 20px 24px;
+  min-height: 100vh;
+  background: #f5f7fb;
+  color: #17243b;
+  font-family: Arial, sans-serif;
+}
+
+.um-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.um-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 5px;
+  color: #14213d;
+}
+
+.um-subtitle {
+  color: #7b879b;
+  font-size: 12px;
+  margin: 0;
+}
+
+.um-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.um-btn {
+  border: none;
+  padding: 9px 13px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.um-btn-primary {
+  background: #2563eb;
+  color: white;
+}
+
+.um-btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.um-btn-secondary {
+  background: white;
+  color: #344054;
+  border: 1px solid #dce2eb;
+}
+
+.um-btn-secondary:hover {
+  background: #eef2f8;
+}
+
+.um-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.um-stat-card {
+  background: white;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e9edf4;
+  box-shadow: 0 2px 8px rgba(20, 33, 61, 0.04);
+}
+
+.um-stat-label {
+  color: #778399;
+  font-size: 11px;
+  margin-bottom: 7px;
+}
+
+.um-stat-value {
+  font-size: 23px;
+  font-weight: 700;
+  color: #17243b;
+}
+
+.um-stat-icon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #edf3ff;
+  color: #2563eb;
+  font-size: 15px;
+  margin-bottom: 9px;
+}
+
+.um-content-card {
+  background: white;
+  border: 1px solid #e9edf4;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(20, 33, 61, 0.04);
+  overflow: hidden;
+}
+
+.um-card-header {
+  padding: 12px 17px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.um-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.um-card-description {
+  color: #8792a5;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.um-filters {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  padding: 12px 17px;
+}
+
+.um-search,
+.um-select,
+.um-input {
+  border: 1px solid #dce2eb;
+  border-radius: 7px;
+  padding: 8px 11px;
+  height: 36px;
+  background: white;
+  color: #344054;
+  outline: none;
+  font-size: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.um-search {
+  max-width: 280px;
+}
+
+.um-search:focus,
+.um-select:focus,
+.um-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.um-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.um-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.um-table th {
+  padding: 11px 17px;
+  background: #f8faff;
+  color: #778399;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 700;
+}
+
+.um-table td {
+  padding: 11px 17px;
+  border-top: 1px solid #edf0f5;
+  font-size: 12px;
+  color: #344054;
+}
+
+.um-table tbody tr:hover {
+  background: #fafcff;
+}
+
+.um-user-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #17243b;
+}
+
+.um-user-mobile {
+  color: #8490a3;
+  font-size: 10px;
+  margin-top: 3px;
+}
+
+.um-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.um-badge-active {
+  background: #e8f8ef;
+  color: #16834a;
+}
+
+.um-badge-inactive {
+  background: #fff0ef;
+  color: #d04438;
+}
+
+.um-badge-role {
+  background: #edf3ff;
+  color: #285bc4;
+}
+
+.um-message {
+  padding: 10px 13px;
+  border-radius: 7px;
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+
+.um-success {
+  background: #e8f8ef;
+  color: #16834a;
+}
+
+.um-error {
+  background: #fff0ef;
+  color: #c9362b;
+}
+
+.um-form-card {
+  background: white;
+  border: 1px solid #e4eaf2;
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 8px rgba(20, 33, 61, 0.04);
+}
+
+.um-form-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+.um-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.um-form-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475467;
+  margin-bottom: 6px;
+}
+
+.um-form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 17px;
+}
+
+.um-empty {
+  padding: 25px;
+  text-align: center;
+  color: #8a94a6;
+  font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .user-management {
+    padding: 14px;
+  }
+
+  .um-title {
+    font-size: 19px;
+  }
+
+  .um-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .um-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .um-header {
+    align-items: flex-start;
+  }
+
+  .um-header-actions {
+    width: 100%;
+  }
+
+  .um-header-actions button {
+    flex: 1;
+  }
+
+  .um-search {
+    max-width: none;
+  }
+
+  .um-card-header {
+    align-items: flex-start;
+  }
+}
+
+
+/* Reduce Dashboard Card Height */
+
+.um-stats {
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.um-stat-card {
+  padding: 9px 13px;
+  min-height: auto;
+}
+
+.um-stat-icon {
+  width: 27px;
+  height: 27px;
+  font-size: 13px;
+  margin-bottom: 6px;
+  border-radius: 7px;
+}
+
+.um-stat-label {
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.um-stat-value {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.um-content-card {
+  margin-top: 0;
+}
+
+.um-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.um-action-btn {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e1e7f0;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #475467;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.um-action-btn:hover {
+  background: #edf3ff;
+  color: #2563eb;
+  border-color: #b9ceff;
+}

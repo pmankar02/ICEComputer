@@ -1,24 +1,97 @@
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
+const API_URL = "http://localhost:5056/api/Auth/login";
+
+interface LoginResponse {
+  message: string;
+  token: string;
+  expiresAt: string;
+  user: {
+    id: string;
+    fullName: string;
+    mobile: string;
+    roles: string[];
+  };
+}
+
 function Login() {
-  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+
+  const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
 
-    if (!email.trim() || !password) {
-      alert("Please enter your email and password.");
+    if (!mobile.trim() || !password) {
+      setError("Please enter your mobile number and password.");
       return;
     }
 
-    // Temporary: API authentication comes later.
-    console.log({ email, rememberMe });
-    alert("Login UI is working! API connection comes next.");
+    if (!/^[0-9]{10}$/.test(mobile)) {
+      setError("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          mobile: mobile.trim(),
+          password: password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.message || "Invalid mobile number or password."
+        );
+      }
+
+      const data = result as LoginResponse;
+
+      if (!data.token) {
+        throw new Error("Token not received from server.");
+      }
+
+      // Save JWT token
+      localStorage.setItem("token", data.token);
+
+      // Save logged-in user details
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      console.log("Login successful");
+      console.log("Logged-in user:", data.user.fullName);
+      console.log("User roles:", data.user.roles);
+
+      alert("Login successful!");
+
+      // Redirect to Dashboard
+      navigate("/");
+
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Something went wrong.";
+
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,16 +111,26 @@ function Login() {
           Enter your credentials to access your account.
         </p>
 
+        {error && (
+          <div className="login-error">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleLogin}>
-          <label htmlFor="email">Email Address</label>
+          <label htmlFor="mobile">Mobile Number</label>
+
           <input
-            id="email"
-            type="email"
+            id="mobile"
+            type="tel"
             className="form-control"
-            placeholder="admin@icecomputer.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter 10-digit mobile number"
+            value={mobile}
+            onChange={(e) =>
+              setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))
+            }
             autoComplete="username"
+            maxLength={10}
             required
           />
 
@@ -96,8 +179,13 @@ function Login() {
             </button>
           </div>
 
-          <button type="submit" className="btn btn-primary login-button">
-            Sign In <i className="bi bi-arrow-right"></i>
+          <button
+            type="submit"
+            className="btn btn-primary login-button"
+            disabled={loading}
+          >
+            {loading ? "Signing In..." : "Sign In"}
+            {!loading && <i className="bi bi-arrow-right"></i>}
           </button>
         </form>
 
