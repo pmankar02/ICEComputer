@@ -1,4 +1,3 @@
-
 import {
   HashRouter,
   Routes,
@@ -36,8 +35,37 @@ function isTokenValid(): boolean {
   }
 }
 
+function getUserRoles(): string[] {
+  try {
+    const storedUser = localStorage.getItem("user");
+    const user = storedUser
+      ? (JSON.parse(storedUser) as { roles?: unknown; role?: unknown })
+      : null;
+
+    if (Array.isArray(user?.roles)) {
+      return user.roles.filter(
+        (role): role is string => typeof role === "string"
+      );
+    }
+
+    if (typeof user?.role === "string") {
+      return [user.role];
+    }
+  } catch {
+    return [];
+  }
+
+  return [];
+}
+
 // Protected Route
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({
+  children,
+  allowedRoles,
+}: {
+  children: React.ReactNode;
+  allowedRoles?: string[];
+}) {
   const location = useLocation();
 
   if (!isTokenValid()) {
@@ -53,6 +81,17 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
+  if (
+    allowedRoles &&
+    !getUserRoles().some((role) =>
+      allowedRoles.some(
+        (allowedRole) => role.toLowerCase() === allowedRole.toLowerCase()
+      )
+    )
+  ) {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 }
 
@@ -60,7 +99,6 @@ function App() {
   return (
     <HashRouter>
       <Routes>
-
         {/* Public Login Page */}
         <Route path="/login" element={<Login />} />
 
@@ -74,17 +112,30 @@ function App() {
         >
           <Route path="/" element={<Dashboard />} />
           <Route path="/students" element={<Students />} />
-          <Route path="/fees" element={<Fees />} />
+          <Route
+            path="/fees"
+            element={
+              <ProtectedRoute allowedRoles={["SuperAdmin"]}>
+                <Fees />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/payment-history" element={<PaymentHistory />} />
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/ai-assistant" element={<AIAssistant />} />
           <Route path="/student-insights" element={<StudentInsights />} />
-          <Route path="/user-management" element={<UserManagement />} />
+          <Route
+            path="/user-management"
+            element={
+              <ProtectedRoute allowedRoles={["SuperAdmin"]}>
+                <UserManagement />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* Invalid URL */}
         <Route path="*" element={<Navigate to="/login" replace />} />
-
       </Routes>
     </HashRouter>
   );

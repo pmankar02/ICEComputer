@@ -20,6 +20,35 @@ const menuItems = [
 function MainLayout() {
   const navigate = useNavigate();
 
+  // Get logged-in user details
+  let userRoles: string[] = [];
+
+  try {
+    const storedUser = localStorage.getItem("user");
+    const user = storedUser ? JSON.parse(storedUser) : null;
+
+    if (Array.isArray(user?.roles)) {
+      userRoles = user.roles;
+    } else if (user?.role) {
+      userRoles = [user.role];
+    }
+  } catch {
+    userRoles = [];
+  }
+
+  const isSuperAdmin = userRoles.some(
+    (role) => role.toLowerCase() === "superadmin"
+  );
+
+  // Show Fees and Users & Roles only to SuperAdmin
+  const visibleMenuItems = menuItems.filter((item) => {
+    if (item.label === "Fees" || item.label === "Users & Roles") {
+      return isSuperAdmin;
+    }
+
+    return true;
+  });
+
   const handleLogout = () => {
     const confirmLogout = window.confirm(
       "Are you sure you want to logout?"
@@ -42,7 +71,7 @@ function MainLayout() {
         </div>
 
         <nav className="app-navigation">
-          {menuItems.map((item) => (
+          {visibleMenuItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
