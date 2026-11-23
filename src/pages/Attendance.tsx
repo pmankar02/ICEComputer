@@ -218,10 +218,6 @@ async function saveAttendance() {
                     </tr>
                   ) : (
                     filteredStudents.map((student) => {
-                      const isMarked = records.some(
-                        (r) => r.studentId === student.id
-                      );
-
                       return (
                         <tr key={student.id}>
                           <td>{student.name}</td>

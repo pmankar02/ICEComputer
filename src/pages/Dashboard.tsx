@@ -11,37 +11,6 @@ import {
 } from "recharts";
 
 
-const activities = [
-  {
-    icon: "bi-cash",
-    color: "green",
-    title: "Fee payment received",
-    description: "Rahul Patil paid ₹2,000 for Tally.",
-    time: "2 minutes ago",
-  },
-  {
-    icon: "bi-person-plus",
-    color: "blue",
-    title: "New student registered",
-    description: "Sneha Jadhav joined MS-CIT.",
-    time: "15 minutes ago",
-  },
-  {
-    icon: "bi-file-earmark-text",
-    color: "purple",
-    title: "New service request",
-    description: "Scholarship form submitted.",
-    time: "30 minutes ago",
-  },
-  {
-    icon: "bi-pc-display",
-    color: "orange",
-    title: "Net cafe session started",
-    description: "PC 05 is now occupied.",
-    time: "1 hour ago",
-  },
-];
-
 const monthlyFees = [
   { month: "Jan", amount: 45 },
   { month: "Feb", amount: 65 },

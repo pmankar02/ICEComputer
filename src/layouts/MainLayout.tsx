@@ -1,6 +1,8 @@
 
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import "./MainLayout.css";
+import FloatingAIAssistant from "../components/FloatingAIAssistant";
+import FloatingWhatsApp from "../components/FloatingWhatsApp";
 
 const menuItems = [
   { label: "Dashboard", path: "/", icon: "bi-grid-fill" },
@@ -12,7 +14,6 @@ const menuItems = [
   { label: "Net Cafe", path: "/netcafe", icon: "bi-pc-display" },
   { label: "Inventory", path: "/inventory", icon: "bi-box-seam" },
   { label: "Reports", path: "/reports", icon: "bi-bar-chart" },
-  { label: "AI Assistant", path: "/ai-assistant", icon: "bi-robot" },
   { label: "Users & Roles", path: "/user-management", icon: "bi-person-gear" },
   { label: "Settings", path: "/settings", icon: "bi-gear" },
 ];
@@ -106,6 +107,12 @@ function MainLayout() {
       <main className="app-content">
         <Outlet />
       </main>
+
+      {/* Floating AI Assistant Fixed Widget */}
+      <FloatingAIAssistant />
+
+      {/* Floating WhatsApp Chat Fixed Widget */}
+      <FloatingWhatsApp />
     </div>
   );
 }
