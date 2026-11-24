@@ -17,6 +17,7 @@ import Attendance from "./pages/Attendance";
 import AIAssistant from "./pages/AIAssistant";
 import StudentInsights from "./pages/StudentInsights";
 import UserManagement from "./pages/UserManagement";
+import Courses from "./pages/Courses";
 
 // Check whether JWT token exists and is valid by expiry
 function isTokenValid(): boolean {
@@ -112,6 +113,7 @@ function App() {
         >
           <Route path="/" element={<Dashboard />} />
           <Route path="/students" element={<Students />} />
+          <Route path="/courses" element={<Courses />} />
           <Route
             path="/fees"
             element={
