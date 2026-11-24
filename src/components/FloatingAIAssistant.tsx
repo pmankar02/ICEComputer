@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./FloatingAIAssistant.css";
+import { API_BASE_URL } from "../config/apiConfig";
 
 interface ChatMessage {
   id: string;
@@ -63,7 +64,7 @@ const FloatingAIAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5056/api/Gemini/chat", {
+      const response = await fetch(`${API_BASE_URL}/api/Gemini/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

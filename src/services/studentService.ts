@@ -1,6 +1,7 @@
 import type { Student,Gender } from "../models/Student";
+import { API_BASE_URL } from "../config/apiConfig";
 
-const API_URL = "http://localhost:5056/api/students";
+const API_URL = `${API_BASE_URL}/api/students`;
 
 interface ApiStudent {
   id?: number;

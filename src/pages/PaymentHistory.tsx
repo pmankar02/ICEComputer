@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "./PaymentHistory.css";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config/apiConfig";
 
 interface Payment {
   id: number;
@@ -28,8 +29,8 @@ interface PaymentHistoryRow extends Payment {
   pendingFees: number;
 }
 
-const PAYMENT_API = "http://localhost:5056/api/FeePayments/all";
-const FEES_API = "http://localhost:5056/api/StudentFees";
+const PAYMENT_API = `${API_BASE_URL}/api/FeePayments/all`;
+const FEES_API = `${API_BASE_URL}/api/StudentFees`;
 
 export default function PaymentHistory() {
   const [payments, setPayments] = useState<Payment[]>([]);

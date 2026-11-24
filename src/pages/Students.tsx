@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "./Students.css";
 import * as XLSX from "xlsx";
+import { API_BASE_URL } from "../config/apiConfig";
 
 
 
@@ -156,7 +157,7 @@ async function handleSubmit(
       formData.append("photo", photo);
 
       const response = await fetch(
-        `http://localhost:5056/api/students/${savedStudentId}/photo`,
+        `${API_BASE_URL}/api/students/${savedStudentId}/photo`,
         {
           method: "POST",
           body: formData,
@@ -224,7 +225,7 @@ async function handleDelete(student: Student) {
       <h2>Student Details</h2>
       {selectedStudent.photoUrl ? (
         <img
-          src={`http://localhost:5056${selectedStudent.photoUrl}`}
+          src={`${API_BASE_URL}${selectedStudent.photoUrl}`}
           alt={selectedStudent.name}
           className="student-details-photo"
         />
@@ -269,7 +270,7 @@ async function handleDelete(student: Student) {
       </button>
 
       <img
-        src={`http://localhost:5056${previewPhoto}`}
+        src={`${API_BASE_URL}${previewPhoto}`}
         alt="Student preview"
         className="photo-modal-image"
       />
@@ -449,7 +450,7 @@ async function handleDelete(student: Student) {
                     <div className="student-name-cell">
                      {student.photoUrl ? (
                       <img
-                        src={`http://localhost:5056${student.photoUrl}`}
+                        src={`${API_BASE_URL}${student.photoUrl}`}
                         alt={student.name}
                         className="student-photo"
                         title="Click to view photo"

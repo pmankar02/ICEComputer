@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Fees.css";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config/apiConfig";
 
 interface StudentOption {
   id: number;
@@ -20,7 +21,7 @@ interface Fee {
   createdDate?: string;
 }
 
-const API_URL = "http://localhost:5056/api/StudentFees";
+const API_URL = `${API_BASE_URL}/api/StudentFees`;
 
 export default function Fees() {
   const [fees, setFees] = useState<Fee[]>([]);
@@ -61,7 +62,7 @@ export default function Fees() {
 
   async function loadStudents() {
     try {
-      const response = await fetch("http://localhost:5056/api/students");
+      const response = await fetch(`${API_BASE_URL}/api/students`);
 
       if (!response.ok) {
         throw new Error("Unable to load students.");

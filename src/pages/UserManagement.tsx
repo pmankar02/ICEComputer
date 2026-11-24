@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import { API_BASE_URL } from "../config/apiConfig";
 import "./UserManagement.css";
 
 interface User {
@@ -48,7 +49,7 @@ function UserManagement() {
       setError("");
 
       const response = await fetch(
-        "http://localhost:5056/api/UserManagement/users",
+        `${API_BASE_URL}/api/UserManagement/users`,
         {
           headers: {
             Authorization: `Bearer ${getToken()}`,
@@ -99,7 +100,7 @@ function UserManagement() {
       setSaving(true);
 
       const response = await fetch(
-        "http://localhost:5056/api/UserManagement/create-user",
+        `${API_BASE_URL}/api/UserManagement/create-user`,
         {
           method: "POST",
           headers: {
@@ -153,7 +154,7 @@ function UserManagement() {
       setSuccess("");
 
       const response = await fetch(
-        `http://localhost:5056/api/UserManagement/users/${editingUser.id}`,
+        `${API_BASE_URL}/api/UserManagement/users/${editingUser.id}`,
         {
           method: "PUT",
           headers: {
@@ -200,7 +201,7 @@ function UserManagement() {
       setSuccess("");
 
       const response = await fetch(
-        `http://localhost:5056/api/UserManagement/users/${user.id}/status`,
+        `${API_BASE_URL}/api/UserManagement/users/${user.id}/status`,
         {
           method: "PUT",
           headers: {
@@ -248,7 +249,7 @@ function UserManagement() {
       setError("");
 
       const response = await fetch(
-        `http://localhost:5056/api/UserManagement/users/${editingUser.id}/reset-password`,
+        `${API_BASE_URL}/api/UserManagement/users/${editingUser.id}/reset-password`,
         {
           method: "PUT",
           headers: {

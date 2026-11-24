@@ -1,8 +1,9 @@
 
 import { useEffect, useState } from "react";
 import "./StudentInsights.css";
+import { API_BASE_URL } from "../config/apiConfig";
 
-const API_URL = "http://localhost:5056/api/StudentInsights";
+const API_URL = `${API_BASE_URL}/api/StudentInsights`;
 
 interface StudentSummary {
   totalStudents: number;

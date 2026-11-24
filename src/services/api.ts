@@ -1,5 +1,5 @@
 
-const API_BASE_URL = "http://localhost:5056";
+import { API_BASE_URL } from "../config/apiConfig";
 
 export async function testApiConnection(): Promise<string> {
   const response = await fetch(`${API_BASE_URL}/weatherforecast`);

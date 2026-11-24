@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./AIAssistant.css";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config/apiConfig";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -70,7 +71,7 @@ const AIAssistant: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5056/api/Gemini/chat",
+        `${API_BASE_URL}/api/Gemini/chat`,
         {
           method: "POST",
           headers: {

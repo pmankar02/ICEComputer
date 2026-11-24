@@ -1,6 +1,7 @@
 
 import "./Dashboard.css";
 import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../config/apiConfig";
 import {
   PieChart,
   Pie,
@@ -50,7 +51,7 @@ function Dashboard() {
     async function loadStudentCount() {
       try {
         const response = await fetch(
-          "http://localhost:5056/api/students"
+          `${API_BASE_URL}/api/students`
         );
 
         if (!response.ok) {
@@ -80,7 +81,7 @@ const distribution = Object.keys(courseCounts).map((name) => ({
 }));
 
 const paymentResponse = await fetch(
-  "http://localhost:5056/api/FeePayments/all"
+  `${API_BASE_URL}/api/FeePayments/all`
 );
 
 if (!paymentResponse.ok) {
@@ -115,7 +116,7 @@ const todaysTotal = payments.reduce((total, payment) => {
 setTodaysCollection(todaysTotal);
 
 const feeResponse = await fetch(
-  "http://localhost:5056/api/StudentFees"
+  `${API_BASE_URL}/api/StudentFees`
 );
 
 if (!feeResponse.ok) {

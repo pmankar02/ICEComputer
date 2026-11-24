@@ -2,8 +2,9 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
+import { API_BASE_URL } from "../config/apiConfig";
 
-const API_URL = "http://localhost:5056/api/Auth/login";
+const API_URL = `${API_BASE_URL}/api/Auth/login`;
 
 interface LoginResponse {
   message: string;

@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
 import "./Attendance.css";
+import { API_BASE_URL } from "../config/apiConfig";
 
 interface Student {
   id: number;
@@ -18,8 +19,8 @@ interface AttendanceRecord {
   remarks?: string;
 }
 
-const STUDENT_API = "http://localhost:5056/api/students";
-const ATTENDANCE_API = "http://localhost:5056/api/Attendance";
+const STUDENT_API = `${API_BASE_URL}/api/students`;
+const ATTENDANCE_API = `${API_BASE_URL}/api/Attendance`;
 
 export default function Attendance() {
   const [students, setStudents] = useState<Student[]>([]);
