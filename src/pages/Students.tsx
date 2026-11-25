@@ -36,8 +36,19 @@ function Students() {
 
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
   const [course, setCourse] = useState("MS-CIT");
+  const [admissionDate, setAdmissionDate] = useState(() =>
+    new Date().toISOString().split("T")[0]
+  );
+  const [courseFees, setCourseFees] = useState<string>("");
   const [status, setStatus] = useState<"Active" | "Inactive">("Active");
+  const [createdAccount, setCreatedAccount] = useState<{
+    studentName: string;
+    username: string;
+    temporaryPassword: string;
+  } | null>(null);
     useEffect(() => {
     async function loadStudents() {
       try {
@@ -110,8 +121,13 @@ function exportToExcel() {
   function resetForm() {
     setName("");
     setMobile("");
+    setEmail("");
+    setAddress("");
     setCourse("MS-CIT");
+    setAdmissionDate(new Date().toISOString().split("T")[0]);
+    setCourseFees("");
     setStatus("Active");
+    setPhoto(null);
     setEditingId(null);
     setShowForm(false);
   }
@@ -131,35 +147,52 @@ async function handleSubmit(
     name,
     gender,
     mobile,
+    email: email.trim() || undefined,
+    address: address.trim() || undefined,
     course,
-    admissionDate: new Date().toISOString(),
+    admissionDate: admissionDate
+      ? new Date(admissionDate).toISOString()
+      : new Date().toISOString(),
+    courseFees: courseFees ? parseFloat(courseFees) || 0 : 0,
     status,
   };
 
   try {
     let savedStudentId = editingId;
+    let newLoginAccount: {
+      username: string;
+      temporaryPassword: string;
+    } | null = null;
 
     if (editingId !== null) {
       await updateStudent(editingId, studentData);
     } else {
-      await addStudent(studentData);
+      const created = await addStudent(studentData);
+      savedStudentId = created.id ?? created.Id ?? null;
+      if (created.loginAccount) {
+        newLoginAccount = {
+          username: created.loginAccount.username,
+          temporaryPassword: created.loginAccount.temporaryPassword,
+        };
+      }
 
-      const savedStudents = await getStudents();
-      const savedStudent = savedStudents.find(
-        (s) => s.mobile === mobile
-      );
-
-      savedStudentId = savedStudent?.id ?? null;
+      if (savedStudentId === null) {
+        const savedStudents = await getStudents();
+        const savedStudent = savedStudents.find((s) => s.mobile === mobile);
+        savedStudentId = savedStudent?.id ?? null;
+      }
     }
 
     if (photo && savedStudentId !== null) {
       const formData = new FormData();
       formData.append("photo", photo);
+      const token = localStorage.getItem("token");
 
       const response = await fetch(
         `${API_BASE_URL}/api/students/${savedStudentId}/photo`,
         {
           method: "POST",
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
           body: formData,
         }
       );
@@ -172,9 +205,18 @@ async function handleSubmit(
     const updatedStudents = await getStudents();
     setStudents(updatedStudents);
     setPage(1);
+    const admittedName = name;
     resetForm();
 
-    alert("Student saved successfully!");
+    if (newLoginAccount) {
+      setCreatedAccount({
+        studentName: admittedName,
+        username: newLoginAccount.username,
+        temporaryPassword: newLoginAccount.temporaryPassword,
+      });
+    } else {
+      alert("Student saved successfully!");
+    }
   } catch (error) {
     alert(
       error instanceof Error
@@ -189,7 +231,15 @@ async function handleSubmit(
     setEditingId(student.id);
     setName(student.name);
     setMobile(student.mobile);
+    setEmail(student.email ?? "");
+    setAddress(student.address ?? "");
+    setGender(student.gender ?? "Male");
     setCourse(student.course);
+    setAdmissionDate(
+      student.admissionDate
+        ? student.admissionDate.split("T")[0]
+        : new Date().toISOString().split("T")[0]
+    );
     setStatus(student.status);
     setShowForm(true);
   }
@@ -218,6 +268,72 @@ async function handleDelete(student: Student) {
 
   return (
     <div className="students-page">
+
+{createdAccount && (
+  <div className="student-modal-overlay">
+    <div className="student-modal" style={{ maxWidth: "460px" }}>
+      <h2 style={{ color: "#059669", marginBottom: "8px" }}>
+        <i className="bi bi-check-circle-fill"></i> Student Admitted &amp; Account Created
+      </h2>
+      <p style={{ fontSize: "13px", color: "#475569", marginBottom: "14px" }}>
+        A Student Login Account has been automatically created for{" "}
+        <strong>{createdAccount.studentName}</strong>. Share these credentials with the student:
+      </p>
+      <div
+        style={{
+          background: "#f8fafc",
+          border: "1px solid #cbd5e1",
+          borderRadius: "8px",
+          padding: "14px",
+          marginBottom: "14px",
+          fontSize: "14px",
+        }}
+      >
+        <p style={{ margin: "0 0 8px" }}>
+          <strong>Login Username (Mobile):</strong> {createdAccount.username}
+        </p>
+        <p style={{ margin: 0 }}>
+          <strong>Temporary Password:</strong>{" "}
+          <code
+            style={{
+              background: "#eff6ff",
+              color: "#1d4ed8",
+              padding: "3px 8px",
+              borderRadius: "4px",
+              fontWeight: 700,
+            }}
+          >
+            {createdAccount.temporaryPassword}
+          </code>
+        </p>
+      </div>
+      <p style={{ fontSize: "12px", color: "#b45309", marginBottom: "14px" }}>
+        Note: The student will be required to change this temporary password on their first login.
+      </p>
+      <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={() => {
+            navigator.clipboard?.writeText(
+              `ICE Computer Student Login\nUsername: ${createdAccount.username}\nTemporary Password: ${createdAccount.temporaryPassword}`
+            );
+            alert("Credentials copied to clipboard!");
+          }}
+        >
+          <i className="bi bi-clipboard"></i> Copy
+        </button>
+        <button
+          type="button"
+          className="modal-close-button"
+          onClick={() => setCreatedAccount(null)}
+        >
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       
 {selectedStudent && (
   <div className="student-modal-overlay">
@@ -238,6 +354,8 @@ async function handleDelete(student: Student) {
       <p><strong>Name:</strong> {selectedStudent.name}</p>
       <p><strong>Gender:</strong> {selectedStudent.gender}</p>
       <p><strong>Mobile:</strong> {selectedStudent.mobile}</p>
+      <p><strong>Email:</strong> {selectedStudent.email || "-"}</p>
+      <p><strong>Address:</strong> {selectedStudent.address || "-"}</p>
       <p><strong>Course:</strong> {selectedStudent.course}</p>
       <p><strong>Admission Date:</strong> {selectedStudent.admissionDate}</p>
       <p><strong>Status:</strong> {selectedStudent.status}</p>
@@ -352,6 +470,27 @@ async function handleDelete(student: Student) {
             </label>
 
             <label>
+              Email (Optional)
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="student@example.com"
+                maxLength={150}
+              />
+            </label>
+
+            <label>
+              Address
+              <input
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Enter residential address"
+                maxLength={300}
+              />
+            </label>
+
+            <label>
               Course
               <select
                 value={course}
@@ -359,12 +498,38 @@ async function handleDelete(student: Student) {
               >
                 <option>MS-CIT</option>
                 <option>Tally</option>
-                <option>Typing</option>
-                <option>English</option>
-                <option>Marathi</option>
+                <option>Typing - Marathi</option>
+                <option>Typing - English</option>
+                <option>Data Entry</option>
+                <option>HTML &amp; CSS</option>
                 <option>Advanced Excel</option>
+                <option>Cyber Security</option>
               </select>
             </label>
+
+            <label>
+              Admission Date
+              <input
+                type="date"
+                value={admissionDate}
+                onChange={(e) => setAdmissionDate(e.target.value)}
+                required
+              />
+            </label>
+
+            {editingId === null && (
+              <label>
+                Course Fees (₹)
+                <input
+                  type="number"
+                  min="0"
+                  step="100"
+                  value={courseFees}
+                  onChange={(e) => setCourseFees(e.target.value)}
+                  placeholder="Enter total course fees"
+                />
+              </label>
+            )}
             <label>
               Student Photo
               <input

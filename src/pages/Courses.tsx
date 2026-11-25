@@ -5,6 +5,7 @@ import {
   updateCourse,
   deleteCourse,
   updateCourseStatus,
+  getCourseImage,
   SUPPORTED_COURSE_NAMES,
 } from "../services/courseService";
 import type { Course, CreateCourseInput } from "../services/courseService";
@@ -45,6 +46,9 @@ export default function Courses() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
+
+  // View Mode: 'cards' or 'table' (Defaults to 'cards')
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
 
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -267,10 +271,30 @@ export default function Courses() {
           <h1>
             <i className="bi bi-book-half"></i> Courses Management
           </h1>
-          <p>Manage institute courses, duration, fees structure, and availability</p>
+          <p>Manage institute courses, duration, fees structure, and visual banners</p>
         </div>
 
         <div className="courses-header-actions">
+          {/* Cards vs Table View Mode Switcher */}
+          <div className="view-mode-toggle">
+            <button
+              type="button"
+              className={`view-toggle-btn ${viewMode === "cards" ? "active" : ""}`}
+              onClick={() => setViewMode("cards")}
+              title="Cards View"
+            >
+              <i className="bi bi-grid-fill"></i> Cards
+            </button>
+            <button
+              type="button"
+              className={`view-toggle-btn ${viewMode === "table" ? "active" : ""}`}
+              onClick={() => setViewMode("table")}
+              title="Table View"
+            >
+              <i className="bi bi-list-ul"></i> Table
+            </button>
+          </div>
+
           <button
             type="button"
             className="btn-course-secondary"
@@ -418,67 +442,40 @@ export default function Courses() {
         </div>
       </section>
 
-      {/* Course Table */}
-      <section className="courses-table-card">
-        <div className="table-responsive">
-          <table className="courses-table">
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Course Name</th>
-                <th>Duration</th>
-                <th>Course Fees</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={7} style={{ textAlign: "center", padding: "40px" }}>
-                    <i className="bi bi-arrow-repeat spin"></i> Loading courses...
-                  </td>
-                </tr>
-              ) : paginatedCourses.length === 0 ? (
-                <tr>
-                  <td colSpan={7}>
-                    <div className="courses-empty-state">
-                      <i className="bi bi-inbox"></i>
-                      <h3>No courses found</h3>
-                      <p>
-                        {courses.length === 0
-                          ? "No courses have been added yet. Click 'Add New Course' to create one."
-                          : "Try adjusting your search query or filter options."}
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                paginatedCourses.map((course) => (
-                  <tr key={course.courseId}>
-                    <td>
-                      <span className="course-code-badge">{course.courseCode}</span>
-                    </td>
-                    <td>
-                      <div className="course-name-cell">
-                        <div className="course-icon-badge">
-                          <i className={`bi ${getCourseIcon(course.courseName)}`}></i>
-                        </div>
-                        <span className="course-name-text">{course.courseName}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span className="course-duration-badge">
-                        <i className="bi bi-clock"></i> {course.duration}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="course-fees-text">
-                        ₹{Number(course.courseFees).toLocaleString("en-IN")}
-                      </span>
-                    </td>
-                    <td>
+      {/* ============================================================== */}
+      {/* VIEW 1: COURSE CARDS GRID (DEFAULT) */}
+      {/* ============================================================== */}
+      {viewMode === "cards" && (
+        <section>
+          {loading ? (
+            <div className="courses-empty-state">
+              <i className="bi bi-arrow-repeat spin"></i>
+              <h3>Loading courses...</h3>
+            </div>
+          ) : paginatedCourses.length === 0 ? (
+            <div className="courses-empty-state">
+              <i className="bi bi-inbox"></i>
+              <h3>No courses found</h3>
+              <p>
+                {courses.length === 0
+                  ? "No courses have been added yet. Click 'Add New Course' to create one."
+                  : "Try adjusting your search query or filter options."}
+              </p>
+            </div>
+          ) : (
+            <div className="courses-cards-grid">
+              {paginatedCourses.map((course) => (
+                <article key={course.courseId} className="course-card">
+                  {/* Image Header with Badges */}
+                  <div className="course-card-image-wrap">
+                    <img
+                      src={getCourseImage(course.courseName)}
+                      alt={course.courseName}
+                      className="course-card-image"
+                      loading="lazy"
+                    />
+                    <div className="course-card-badges">
+                      <span className="course-card-code">{course.courseCode}</span>
                       <span
                         className={`status-badge ${
                           course.status === "Active"
@@ -489,30 +486,50 @@ export default function Courses() {
                         <span className="status-dot"></span>
                         {course.status}
                       </span>
-                    </td>
-                    <td style={{ color: "#64748b", fontSize: "12px" }}>
-                      {new Date(course.createdAt).toLocaleDateString("en-IN", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      <div
-                        className="action-buttons-group"
-                        style={{ justifyContent: "flex-end" }}
-                      >
-                        {/* View Details */}
+                    </div>
+                  </div>
+
+                  {/* Card Body */}
+                  <div className="course-card-body">
+                    <div className="course-card-header">
+                      <h3 className="course-card-title">{course.courseName}</h3>
+                    </div>
+
+                    <p className="course-card-desc">
+                      {course.description ||
+                        `Comprehensive practical training program in ${course.courseName} with certification.`}
+                    </p>
+
+                    <div className="course-card-meta">
+                      <div className="course-card-duration">
+                        <i className="bi bi-clock-history"></i> {course.duration}
+                      </div>
+                      <div className="course-card-fee">
+                        ₹{Number(course.courseFees).toLocaleString("en-IN")}
+                      </div>
+                    </div>
+
+                    {/* Card Footer Actions */}
+                    <div className="course-card-footer">
+                      <span className="course-card-date">
+                        Added:{" "}
+                        {new Date(course.createdAt).toLocaleDateString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+
+                      <div className="action-buttons-group">
                         <button
                           type="button"
                           className="action-btn action-btn-view"
-                          title="View Details"
+                          title="View Course Details"
                           onClick={() => handleOpenViewModal(course)}
                         >
                           <i className="bi bi-eye"></i>
                         </button>
 
-                        {/* SuperAdmin Actions */}
                         {isSuperAdmin && (
                           <>
                             <button
@@ -554,59 +571,268 @@ export default function Courses() {
                           </>
                         )}
                       </div>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination Bar for Cards View */}
+          {!loading && filteredCourses.length > 0 && (
+            <div
+              className="courses-pagination"
+              style={{
+                background: "#ffffff",
+                borderRadius: "12px",
+                border: "1px solid #e2e8f0",
+              }}
+            >
+              <span>
+                Showing{" "}
+                <strong>
+                  {(currentPage - 1) * ITEMS_PER_PAGE + 1} -{" "}
+                  {Math.min(currentPage * ITEMS_PER_PAGE, filteredCourses.length)}
+                </strong>{" "}
+                of <strong>{filteredCourses.length}</strong> courses
+              </span>
+
+              <div className="pagination-controls">
+                <button
+                  type="button"
+                  className="pagination-btn"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                >
+                  Previous
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (pageNum) => (
+                    <button
+                      key={pageNum}
+                      type="button"
+                      className={`pagination-btn ${
+                        currentPage === pageNum ? "active" : ""
+                      }`}
+                      onClick={() => setCurrentPage(pageNum)}
+                    >
+                      {pageNum}
+                    </button>
+                  )
+                )}
+
+                <button
+                  type="button"
+                  className="pagination-btn"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ============================================================== */}
+      {/* VIEW 2: COURSE TABLE VIEW */}
+      {/* ============================================================== */}
+      {viewMode === "table" && (
+        <section className="courses-table-card">
+          <div className="table-responsive">
+            <table className="courses-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Course Banner &amp; Name</th>
+                  <th>Duration</th>
+                  <th>Course Fees</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th style={{ textAlign: "right" }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: "center", padding: "40px" }}>
+                      <i className="bi bi-arrow-repeat spin"></i> Loading courses...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ) : paginatedCourses.length === 0 ? (
+                  <tr>
+                    <td colSpan={7}>
+                      <div className="courses-empty-state">
+                        <i className="bi bi-inbox"></i>
+                        <h3>No courses found</h3>
+                        <p>
+                          {courses.length === 0
+                            ? "No courses have been added yet. Click 'Add New Course' to create one."
+                            : "Try adjusting your search query or filter options."}
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  paginatedCourses.map((course) => (
+                    <tr key={course.courseId}>
+                      <td>
+                        <span className="course-code-badge">{course.courseCode}</span>
+                      </td>
+                      <td>
+                        <div className="course-name-cell">
+                          <img
+                            src={getCourseImage(course.courseName)}
+                            alt={course.courseName}
+                            className="course-table-thumbnail"
+                          />
+                          <span className="course-name-text">{course.courseName}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="course-duration-badge">
+                          <i className="bi bi-clock"></i> {course.duration}
+                        </span>
+                      </td>
+                      <td>
+                        <span className="course-fees-text">
+                          ₹{Number(course.courseFees).toLocaleString("en-IN")}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`status-badge ${
+                            course.status === "Active"
+                              ? "status-badge-active"
+                              : "status-badge-inactive"
+                          }`}
+                        >
+                          <span className="status-dot"></span>
+                          {course.status}
+                        </span>
+                      </td>
+                      <td style={{ color: "#64748b", fontSize: "12px" }}>
+                        {new Date(course.createdAt).toLocaleDateString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        <div
+                          className="action-buttons-group"
+                          style={{ justifyContent: "flex-end" }}
+                        >
+                          <button
+                            type="button"
+                            className="action-btn action-btn-view"
+                            title="View Details"
+                            onClick={() => handleOpenViewModal(course)}
+                          >
+                            <i className="bi bi-eye"></i>
+                          </button>
 
-        {/* Pagination Bar */}
-        {!loading && filteredCourses.length > 0 && (
-          <div className="courses-pagination">
-            <span>
-              Showing{" "}
-              <strong>
-                {(currentPage - 1) * ITEMS_PER_PAGE + 1} -{" "}
-                {Math.min(currentPage * ITEMS_PER_PAGE, filteredCourses.length)}
-              </strong>{" "}
-              of <strong>{filteredCourses.length}</strong> courses
-            </span>
+                          {isSuperAdmin && (
+                            <>
+                              <button
+                                type="button"
+                                className="action-btn action-btn-edit"
+                                title="Edit Course"
+                                onClick={() => handleOpenEditModal(course)}
+                              >
+                                <i className="bi bi-pencil"></i>
+                              </button>
 
-            <div className="pagination-controls">
-              <button
-                type="button"
-                className="pagination-btn"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              >
-                Previous
-              </button>
+                              <button
+                                type="button"
+                                className="action-btn action-btn-status"
+                                title={
+                                  course.status === "Active"
+                                    ? "Deactivate Course"
+                                    : "Activate Course"
+                                }
+                                onClick={() => handleToggleStatus(course)}
+                              >
+                                <i
+                                  className={`bi ${
+                                    course.status === "Active"
+                                      ? "bi-toggle-on"
+                                      : "bi-toggle-off"
+                                  }`}
+                                ></i>
+                              </button>
 
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                <button
-                  key={pageNum}
-                  type="button"
-                  className={`pagination-btn ${currentPage === pageNum ? "active" : ""}`}
-                  onClick={() => setCurrentPage(pageNum)}
-                >
-                  {pageNum}
-                </button>
-              ))}
-
-              <button
-                type="button"
-                className="pagination-btn"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              >
-                Next
-              </button>
-            </div>
+                              <button
+                                type="button"
+                                className="action-btn action-btn-delete"
+                                title="Delete Course"
+                                onClick={() => handleDeleteCourse(course)}
+                              >
+                                <i className="bi bi-trash"></i>
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
-      </section>
+
+          {/* Pagination Bar for Table View */}
+          {!loading && filteredCourses.length > 0 && (
+            <div className="courses-pagination">
+              <span>
+                Showing{" "}
+                <strong>
+                  {(currentPage - 1) * ITEMS_PER_PAGE + 1} -{" "}
+                  {Math.min(currentPage * ITEMS_PER_PAGE, filteredCourses.length)}
+                </strong>{" "}
+                of <strong>{filteredCourses.length}</strong> courses
+              </span>
+
+              <div className="pagination-controls">
+                <button
+                  type="button"
+                  className="pagination-btn"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                >
+                  Previous
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (pageNum) => (
+                    <button
+                      key={pageNum}
+                      type="button"
+                      className={`pagination-btn ${
+                        currentPage === pageNum ? "active" : ""
+                      }`}
+                      onClick={() => setCurrentPage(pageNum)}
+                    >
+                      {pageNum}
+                    </button>
+                  )
+                )}
+
+                <button
+                  type="button"
+                  className="pagination-btn"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Add / Edit Course Modal */}
       {isModalOpen && (
@@ -628,6 +854,15 @@ export default function Courses() {
 
             <form onSubmit={handleSubmitForm}>
               <div className="courses-modal-body">
+                {/* Live Image Banner Preview */}
+                {formData.courseName && (
+                  <img
+                    src={getCourseImage(formData.courseName)}
+                    alt="Course Preview"
+                    className="course-modal-banner"
+                  />
+                )}
+
                 {/* Quick Presets for New Courses */}
                 {!editingCourse && (
                   <div style={{ marginBottom: "16px" }}>
@@ -795,6 +1030,13 @@ export default function Courses() {
             </div>
 
             <div className="courses-modal-body">
+              {/* Course Banner Image in Details Modal */}
+              <img
+                src={getCourseImage(viewingCourse.courseName)}
+                alt={viewingCourse.courseName}
+                className="course-modal-banner"
+              />
+
               <div className="course-details-list">
                 <div className="course-detail-item">
                   <div className="course-detail-label">Course Code</div>

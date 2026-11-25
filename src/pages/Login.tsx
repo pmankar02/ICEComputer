@@ -15,6 +15,7 @@ interface LoginResponse {
     fullName: string;
     mobile: string;
     roles: string[];
+    mustChangePassword?: boolean;
   };
 }
 
@@ -82,8 +83,22 @@ function Login() {
 
       alert("Login successful!");
 
-      // Redirect to Dashboard
-      navigate("/");
+      if (data.user.mustChangePassword) {
+        navigate("/change-password", { replace: true });
+        return;
+      }
+
+      const isStudentOnly =
+        data.user.roles?.some((r) => r.toLowerCase() === "student") &&
+        !data.user.roles?.some((r) =>
+          ["superadmin", "adminstaff", "faculty"].includes(r.toLowerCase())
+        );
+
+      if (isStudentOnly) {
+        navigate("/student-dashboard", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
 
     } catch (err) {
       const message =

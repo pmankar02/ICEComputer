@@ -1,13 +1,20 @@
 
+import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import "./MainLayout.css";
 import FloatingAIAssistant from "../components/FloatingAIAssistant";
 import FloatingWhatsApp from "../components/FloatingWhatsApp";
+import {
+  getGovernmentUpdates,
+  getReadUpdateIds,
+  isUpdateUnread,
+} from "../services/govtUpdateService";
 
 const menuItems = [
   { label: "Dashboard", path: "/", icon: "bi-grid-fill" },
   { label: "Students", path: "/students", icon: "bi-people" },
   { label: "Courses", path: "/courses", icon: "bi-book" },
+  { label: "Govt. Updates", path: "/govt-updates", icon: "bi-megaphone-fill" },
   { label: "Fees", path: "/fees", icon: "bi-wallet2" },
   { label: "Attendance", path: "/attendance", icon: "bi-calendar-check" },
   { label: "Online Services", path: "/services", icon: "bi-file-earmark-text" },
@@ -20,6 +27,33 @@ const menuItems = [
 
 function MainLayout() {
   const navigate = useNavigate();
+  const [unreadUpdatesCount, setUnreadUpdatesCount] = useState<number>(0);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const refreshUnreadCount = async () => {
+      try {
+        const items = await getGovernmentUpdates();
+        if (!mounted) return;
+        const readIds = getReadUpdateIds();
+        const count = items.filter((u) => isUpdateUnread(u, readIds)).length;
+        setUnreadUpdatesCount(count);
+      } catch {
+        // Ignore silent background polling errors
+      }
+    };
+
+    refreshUnreadCount();
+    const interval = setInterval(refreshUnreadCount, 60000);
+    window.addEventListener("govt-updates-read-changed", refreshUnreadCount);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+      window.removeEventListener("govt-updates-read-changed", refreshUnreadCount);
+    };
+  }, []);
 
   // Get logged-in user details
   let userRoles: string[] = [];
@@ -41,14 +75,26 @@ function MainLayout() {
     (role) => role.toLowerCase() === "superadmin"
   );
 
-  // Show Fees and Users & Roles only to SuperAdmin
-  const visibleMenuItems = menuItems.filter((item) => {
-    if (item.label === "Fees" || item.label === "Users & Roles") {
-      return isSuperAdmin;
-    }
+  const isStudentOnly =
+    userRoles.some((role) => role.toLowerCase() === "student") &&
+    !userRoles.some((role) =>
+      ["superadmin", "adminstaff", "faculty"].includes(role.toLowerCase())
+    );
 
-    return true;
-  });
+  // Show Student-only menu to Students; show Admin/Staff menu to Staff/SuperAdmin
+  const visibleMenuItems = isStudentOnly
+    ? [
+        { label: "My Dashboard", path: "/student-dashboard", icon: "bi-grid-fill" },
+        { label: "Courses", path: "/courses", icon: "bi-book" },
+        { label: "Govt. Updates", path: "/govt-updates", icon: "bi-megaphone-fill" },
+      ]
+    : menuItems.filter((item) => {
+        if (item.label === "Fees" || item.label === "Users & Roles") {
+          return isSuperAdmin;
+        }
+
+        return true;
+      });
 
   const handleLogout = () => {
     const confirmLogout = window.confirm(
@@ -83,6 +129,9 @@ function MainLayout() {
             >
               <i className={`bi ${item.icon}`}></i>
               <span>{item.label}</span>
+              {item.path === "/govt-updates" && unreadUpdatesCount > 0 && (
+                <span className="app-nav-badge">{unreadUpdatesCount}</span>
+              )}
             </NavLink>
           ))}
         </nav>

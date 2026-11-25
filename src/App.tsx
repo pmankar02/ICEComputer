@@ -18,6 +18,9 @@ import AIAssistant from "./pages/AIAssistant";
 import StudentInsights from "./pages/StudentInsights";
 import UserManagement from "./pages/UserManagement";
 import Courses from "./pages/Courses";
+import GovtUpdates from "./pages/GovtUpdates";
+import ChangePassword from "./pages/ChangePassword";
+import StudentDashboard from "./pages/StudentDashboard";
 
 // Check whether JWT token exists and is valid by expiry
 function isTokenValid(): boolean {
@@ -36,27 +39,42 @@ function isTokenValid(): boolean {
   }
 }
 
-function getUserRoles(): string[] {
+function getStoredUser(): {
+  roles?: unknown;
+  role?: unknown;
+  mustChangePassword?: boolean;
+} | null {
   try {
     const storedUser = localStorage.getItem("user");
-    const user = storedUser
-      ? (JSON.parse(storedUser) as { roles?: unknown; role?: unknown })
-      : null;
-
-    if (Array.isArray(user?.roles)) {
-      return user.roles.filter(
-        (role): role is string => typeof role === "string"
-      );
-    }
-
-    if (typeof user?.role === "string") {
-      return [user.role];
-    }
+    return storedUser ? JSON.parse(storedUser) : null;
   } catch {
-    return [];
+    return null;
+  }
+}
+
+function getUserRoles(): string[] {
+  const user = getStoredUser();
+
+  if (Array.isArray(user?.roles)) {
+    return user.roles.filter(
+      (role): role is string => typeof role === "string"
+    );
+  }
+
+  if (typeof user?.role === "string") {
+    return [user.role];
   }
 
   return [];
+}
+
+function isStudentOnlyUser(roles: string[]): boolean {
+  return (
+    roles.some((r) => r.toLowerCase() === "student") &&
+    !roles.some((r) =>
+      ["superadmin", "adminstaff", "faculty"].includes(r.toLowerCase())
+    )
+  );
 }
 
 // Protected Route
@@ -82,15 +100,27 @@ function ProtectedRoute({
     );
   }
 
+  const user = getStoredUser();
+  if (user?.mustChangePassword && location.pathname !== "/change-password") {
+    return <Navigate to="/change-password" replace />;
+  }
+
+  const roles = getUserRoles();
+
   if (
     allowedRoles &&
-    !getUserRoles().some((role) =>
+    !roles.some((role) =>
       allowedRoles.some(
         (allowedRole) => role.toLowerCase() === allowedRole.toLowerCase()
       )
     )
   ) {
-    return <Navigate to="/" replace />;
+    return (
+      <Navigate
+        to={isStudentOnlyUser(roles) ? "/student-dashboard" : "/"}
+        replace
+      />
+    );
   }
 
   return children;
@@ -103,6 +133,16 @@ function App() {
         {/* Public Login Page */}
         <Route path="/login" element={<Login />} />
 
+        {/* First-Login Mandatory Password Change */}
+        <Route
+          path="/change-password"
+          element={
+            <ProtectedRoute>
+              <ChangePassword />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Protected Application Pages */}
         <Route
           element={
@@ -111,9 +151,32 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/students" element={<Students />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute allowedRoles={["SuperAdmin", "AdminStaff", "Faculty"]}>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student-dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["Student"]}>
+                <StudentDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/students"
+            element={
+              <ProtectedRoute allowedRoles={["SuperAdmin", "AdminStaff", "Faculty"]}>
+                <Students />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/courses" element={<Courses />} />
+          <Route path="/govt-updates" element={<GovtUpdates />} />
           <Route
             path="/fees"
             element={
@@ -122,10 +185,38 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/payment-history" element={<PaymentHistory />} />
-          <Route path="/attendance" element={<Attendance />} />
-          <Route path="/ai-assistant" element={<AIAssistant />} />
-          <Route path="/student-insights" element={<StudentInsights />} />
+          <Route
+            path="/payment-history"
+            element={
+              <ProtectedRoute allowedRoles={["SuperAdmin", "AdminStaff", "Faculty"]}>
+                <PaymentHistory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/attendance"
+            element={
+              <ProtectedRoute allowedRoles={["SuperAdmin", "AdminStaff", "Faculty"]}>
+                <Attendance />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ai-assistant"
+            element={
+              <ProtectedRoute allowedRoles={["SuperAdmin", "AdminStaff", "Faculty"]}>
+                <AIAssistant />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student-insights"
+            element={
+              <ProtectedRoute allowedRoles={["SuperAdmin", "AdminStaff", "Faculty"]}>
+                <StudentInsights />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/user-management"
             element={

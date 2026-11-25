@@ -43,6 +43,19 @@ export const SUPPORTED_COURSE_NAMES = [
   "Cyber Security",
 ] as const;
 
+export function getCourseImage(courseName: string): string {
+  const lower = courseName.toLowerCase();
+  if (lower.includes("ms-cit") || lower.includes("mscit")) return "/course-images/mscit.svg";
+  if (lower.includes("tally")) return "/course-images/tally.svg";
+  if (lower.includes("marathi")) return "/course-images/typing-marathi.svg";
+  if (lower.includes("typing") || lower.includes("english")) return "/course-images/typing-english.svg";
+  if (lower.includes("data entry")) return "/course-images/data-entry.svg";
+  if (lower.includes("html") || lower.includes("css")) return "/course-images/html-css.svg";
+  if (lower.includes("excel")) return "/course-images/advanced-excel.svg";
+  if (lower.includes("cyber") || lower.includes("security")) return "/course-images/cyber-security.svg";
+  return "/course-images/default-course.svg";
+}
+
 function getAuthHeaders(): HeadersInit {
   const token = localStorage.getItem("token");
   return {

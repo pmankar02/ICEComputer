@@ -1,7 +1,14 @@
 
 import "./Dashboard.css";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config/apiConfig";
+import {
+  getGovernmentUpdates,
+  getReadUpdateIds,
+  isUpdateUnread,
+} from "../services/govtUpdateService";
+import type { GovernmentUpdate } from "../services/govtUpdateService";
 import {
   PieChart,
   Pie,
@@ -26,6 +33,11 @@ const monthlyFees = [
 ];
 
 function Dashboard() {
+  const navigate = useNavigate();
+  const [govtUpdates, setGovtUpdates] = useState<GovernmentUpdate[]>([]);
+  const [readUpdateIds, setReadUpdateIds] = useState<number[]>(() =>
+    getReadUpdateIds()
+  );
   const [totalStudents, setTotalStudents] = useState(0);
   const [activeStudents, setActiveStudents] = useState(0);
   const [inactiveStudents, setInactiveStudents] = useState(0);
@@ -203,6 +215,17 @@ setInactiveStudents(
     }
 
     loadStudentCount();
+
+    async function loadGovtUpdates() {
+      try {
+        const items = await getGovernmentUpdates();
+        setGovtUpdates(items.filter((u) => u.isPublished).slice(0, 4));
+        setReadUpdateIds(getReadUpdateIds());
+      } catch {
+        // Ignore if unauthenticated or offline
+      }
+    }
+    loadGovtUpdates();
   }, []);
   
     const stats = [
@@ -514,6 +537,108 @@ setInactiveStudents(
             )}
           </div>
         </article>
+        </section>
+
+        <section className="panel" style={{ marginTop: "20px" }}>
+          <div className="panel-header">
+            <div>
+              <h3>Latest Government Updates &amp; Alerts</h3>
+              <p>Job vacancies, exam forms, scholarships, and admissions</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/govt-updates")}
+              style={{
+                background: "#2563eb",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "8px",
+                padding: "8px 14px",
+                fontSize: "12px",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              View All Updates
+            </button>
+          </div>
+
+          <div className="activity-list">
+            {govtUpdates.length === 0 ? (
+              <p>No published government updates yet.</p>
+            ) : (
+              govtUpdates.map((item) => {
+                const isNew = isUpdateUnread(item, readUpdateIds);
+                return (
+                  <div
+                    className="activity-item"
+                    key={item.id}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigate("/govt-updates")}
+                  >
+                    <div
+                      className={`activity-icon ${
+                        item.isImportant ? "orange" : "blue"
+                      }`}
+                    >
+                      <i
+                        className={`bi ${
+                          item.isImportant
+                            ? "bi-pin-angle-fill"
+                            : "bi-megaphone-fill"
+                        }`}
+                      ></i>
+                    </div>
+
+                    <div className="activity-details" style={{ flex: 1 }}>
+                      <strong style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        {item.title}
+                        {isNew && (
+                          <span
+                            style={{
+                              background: "#2563eb",
+                              color: "#ffffff",
+                              fontSize: "10px",
+                              padding: "2px 6px",
+                              borderRadius: "10px",
+                            }}
+                          >
+                            NEW
+                          </span>
+                        )}
+                        {item.isImportant && (
+                          <span
+                            style={{
+                              background: "#fef2f2",
+                              color: "#dc2626",
+                              border: "1px solid #fecaca",
+                              fontSize: "10px",
+                              padding: "1px 6px",
+                              borderRadius: "10px",
+                            }}
+                          >
+                            IMPORTANT
+                          </span>
+                        )}
+                      </strong>
+                      <p>
+                        {item.category} · Last Date:{" "}
+                        {item.applicationLastDate
+                          ? new Date(item.applicationLastDate).toLocaleDateString("en-IN")
+                          : "See Details"}
+                      </p>
+                      <small>
+                        Published:{" "}
+                        {new Date(
+                          item.publishedAt || item.createdAt
+                        ).toLocaleDateString("en-IN")}
+                      </small>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
         </section>
 
         <footer className="dashboard-footer">

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg-default" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="50%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <filter id="default-shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <rect width="640" height="360" fill="url(#bg-default)"/>
+
+  <circle cx="560" cy="80" r="130" fill="#94a3b8" opacity="0.2"/>
+  <circle cx="80" cy="270" r="100" fill="#1e293b" opacity="0.3"/>
+
+  <!-- Graduation Cap & Certificate Illustration -->
+  <g filter="url(#default-shadow)">
+    <!-- Graduation Cap Top Diamond -->
+    <polygon points="320,70 440,110 320,150 200,110" fill="#2563eb" stroke="#60a5fa" stroke-width="2"/>
+    <!-- Cap Skull Base -->
+    <path d="M 240 125 L 240 160 C 240 185, 400 185, 400 160 L 400 125 Z" fill="#1d4ed8"/>
+    <!-- Tassel Ribbon -->
+    <path d="M 320 110 L 210 135 L 210 185" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="210" cy="190" r="8" fill="#f59e0b"/>
+
+    <!-- Certified Diploma Banner -->
+    <rect x="230" y="200" width="180" height="34" rx="8" fill="#ffffff"/>
+    <text x="320" y="222" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#0f172a" text-anchor="middle">CERTIFIED COURSE</text>
+  </g>
+
+  <!-- Title Badge -->
+  <g filter="url(#default-shadow)">
+    <rect x="40" y="278" width="560" height="58" rx="14" fill="#0f172a" fill-opacity="0.9" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="65" y="315" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="800" fill="#ffffff">Professional IT Course</text>
+    <text x="360" y="306" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#93c5fd">ICE Computer Institute</text>
+    <text x="360" y="324" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="500" fill="#e2e8f0">Skill Development • Practical Labs • Certification</text>
+  </g>
+</svg>

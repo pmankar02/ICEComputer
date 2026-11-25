@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg-excel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="50%" stop-color="#15803d"/>
+      <stop offset="100%" stop-color="#22c55e"/>
+    </linearGradient>
+    <filter id="excel-shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#052e16" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <rect width="640" height="360" fill="url(#bg-excel)"/>
+
+  <circle cx="560" cy="80" r="130" fill="#bbf7d0" opacity="0.2"/>
+  <circle cx="80" cy="270" r="100" fill="#14532d" opacity="0.3"/>
+
+  <!-- Excel Grid, Formula Bar & Charts -->
+  <g filter="url(#excel-shadow)">
+    <!-- Sheet Window -->
+    <rect x="160" y="50" width="320" height="195" rx="14" fill="#ffffff"/>
+    <rect x="160" y="50" width="320" height="40" rx="14" fill="#15803d"/>
+    <rect x="160" y="76" width="320" height="14" fill="#15803d"/>
+    <text x="180" y="75" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#ffffff">Microsoft Excel 365</text>
+
+    <!-- Formula Bar -->
+    <rect x="175" y="98" width="290" height="22" rx="4" fill="#f1f5f9"/>
+    <text x="185" y="113" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#15803d">fx</text>
+    <text x="205" y="113" font-family="'Courier New', monospace" font-size="11" font-weight="bold" fill="#0f172a">=XLOOKUP(A2, C2:C100, D2:D100)</text>
+
+    <!-- Data Grid with Bar Chart Overlay -->
+    <g fill="#f8fafc" stroke="#cbd5e1" stroke-width="1">
+      <rect x="175" y="126" width="68" height="24"/>
+      <rect x="243" y="126" width="68" height="24"/>
+      <rect x="311" y="126" width="68" height="24"/>
+      <rect x="379" y="126" width="86" height="24"/>
+
+      <rect x="175" y="150" width="68" height="22"/>
+      <rect x="243" y="150" width="68" height="22"/>
+      <rect x="311" y="150" width="68" height="22"/>
+      <rect x="379" y="150" width="86" height="22"/>
+    </g>
+
+    <!-- Chart Columns -->
+    <rect x="200" y="180" width="22" height="45" rx="4" fill="#16a34a"/>
+    <rect x="235" y="195" width="22" height="30" rx="4" fill="#22c55e"/>
+    <rect x="270" y="170" width="22" height="55" rx="4" fill="#15803d"/>
+    <rect x="305" y="185" width="22" height="40" rx="4" fill="#4ade80"/>
+
+    <!-- Pivot Badge -->
+    <rect x="345" y="180" width="110" height="45" rx="6" fill="#f0fdf4" stroke="#86efac"/>
+    <text x="355" y="200" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#15803d">Pivot Table</text>
+    <text x="355" y="215" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#475569">VLOOKUP &bull; Dashboards</text>
+  </g>
+
+  <!-- Title Badge -->
+  <g filter="url(#excel-shadow)">
+    <rect x="40" y="278" width="560" height="58" rx="14" fill="#052e16" fill-opacity="0.9" stroke="#86efac" stroke-width="1.5"/>
+    <text x="65" y="315" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="800" fill="#ffffff">Advanced Excel</text>
+    <text x="360" y="306" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#86efac">Data Analytics &amp; Reporting</text>
+    <text x="360" y="324" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="500" fill="#dcfce7">Formulas • Pivot Tables • Macros • Interactive Dashboards</text>
+  </g>
+</svg>
