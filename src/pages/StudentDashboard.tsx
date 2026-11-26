@@ -6,6 +6,7 @@ import {
   getGovernmentUpdates,
   getReadUpdateIds,
   isUpdateUnread,
+  markUpdateAsRead,
 } from "../services/govtUpdateService";
 import type { GovernmentUpdate } from "../services/govtUpdateService";
 import {
@@ -18,9 +19,16 @@ import type {
   StudentFeesSummary,
   StudentProfile,
 } from "../services/studentPortalService";
+import "./Dashboard.css";
 import "./StudentDashboard.css";
 
-type PortalTab = "overview" | "profile" | "courses" | "fees" | "attendance" | "updates";
+type PortalTab =
+  | "overview"
+  | "profile"
+  | "courses"
+  | "fees"
+  | "attendance"
+  | "updates";
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
@@ -28,38 +36,42 @@ export default function StudentDashboard() {
   const [activeTab, setActiveTab] = useState<PortalTab>("overview");
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [fees, setFees] = useState<StudentFeesSummary | null>(null);
-  const [attendance, setAttendance] = useState<StudentAttendanceSummary | null>(null);
+  const [attendance, setAttendance] = useState<StudentAttendanceSummary | null>(
+    null
+  );
   const [updates, setUpdates] = useState<GovernmentUpdate[]>([]);
-  const [readIds] = useState<number[]>(() => getReadUpdateIds());
+  const [readIds, setReadIds] = useState<number[]>(() => getReadUpdateIds());
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
-  useEffect(() => {
-    async function loadPortalData() {
-      try {
-        setLoading(true);
-        setError("");
+  const loadPortalData = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-        const [profileRes, feesRes, attendanceRes, updatesRes] = await Promise.all([
+      const [profileRes, feesRes, attendanceRes, updatesRes] =
+        await Promise.all([
           getMyProfile(),
           getMyFees(),
           getMyAttendance(),
           getGovernmentUpdates(),
         ]);
 
-        setProfile(profileRes);
-        setFees(feesRes);
-        setAttendance(attendanceRes);
-        setUpdates(updatesRes.filter((u) => u.isPublished));
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load student dashboard."
-        );
-      } finally {
-        setLoading(false);
-      }
+      setProfile(profileRes);
+      setFees(feesRes);
+      setAttendance(attendanceRes);
+      setUpdates(updatesRes.filter((u) => u.isPublished));
+      setReadIds(getReadUpdateIds());
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to load student dashboard."
+      );
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     loadPortalData();
   }, []);
 
@@ -68,10 +80,14 @@ export default function StudentDashboard() {
     [updates, readIds]
   );
 
+  const totalEnrolledCourses = profile?.course ? 1 : 0;
+
   if (loading) {
     return (
       <div className="student-portal">
-        <div className="sp-panel">Loading your Student Dashboard...</div>
+        <div className="panel">
+          <p className="sp-empty-text">Loading your Student Dashboard...</p>
+        </div>
       </div>
     );
   }
@@ -79,11 +95,20 @@ export default function StudentDashboard() {
   if (error) {
     return (
       <div className="student-portal">
-        <div
-          className="sp-panel"
-          style={{ borderColor: "#fecaca", background: "#fef2f2", color: "#b91c1c" }}
-        >
-          <strong>Unable to load student portal:</strong> {error}
+        <div className="panel">
+          <div className="panel-header">
+            <div>
+              <h3>Unable to load Student Dashboard</h3>
+              <p>{error}</p>
+            </div>
+            <button
+              type="button"
+              className="sp-btn-primary"
+              onClick={loadPortalData}
+            >
+              <i className="bi bi-arrow-clockwise"></i> Retry
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -91,99 +116,126 @@ export default function StudentDashboard() {
 
   return (
     <div className="student-portal">
-      {/* Header */}
-      <header className="sp-header">
-        <div className="sp-welcome">
-          {profile?.photoUrl ? (
-            <img
-              src={`${API_BASE_URL}${profile.photoUrl}`}
-              alt={profile.name}
-              className="sp-avatar"
-            />
-          ) : (
-            <div className="sp-avatar">
-              <i className="bi bi-person-fill"></i>
-            </div>
-          )}
-          <div>
-            <h1>Welcome, {profile?.name || "Student"}!</h1>
-            <p>
-              Course: <strong>{profile?.course}</strong> · Mobile:{" "}
-              <strong>{profile?.mobile}</strong>
-            </p>
-          </div>
+      {/* Topbar matching existing Dashboard layout & colors */}
+      <header className="topbar">
+        <div>
+          <h1>Welcome, {profile?.name || "Student"}</h1>
+          <p>
+            Student Dashboard · ICE Computer Institute
+          </p>
         </div>
 
-        <div className="sp-actions">
+        <div className="sp-topbar-actions">
           <button
             type="button"
             className="sp-btn-secondary"
             onClick={() => navigate("/change-password")}
           >
-            <i className="bi bi-key-fill"></i> Change Password
+            <i className="bi bi-key"></i> Change Password
           </button>
+
           <button
             type="button"
-            className="sp-btn-primary"
+            className="notification-button"
+            title="Government Updates & Notifications"
             onClick={() => navigate("/govt-updates")}
+            style={{ position: "relative", cursor: "pointer" }}
           >
-            <i className="bi bi-megaphone-fill"></i> Govt. Updates
-            {unreadUpdatesCount > 0 && ` (${unreadUpdatesCount} New)`}
+            <i className="bi bi-bell-fill"></i>
+            {unreadUpdatesCount > 0 && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: "4px",
+                  right: "4px",
+                  background: "#1677ff",
+                  color: "#ffffff",
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  borderRadius: "999px",
+                  padding: "1px 5px",
+                  lineHeight: 1.2,
+                }}
+              >
+                {unreadUpdatesCount}
+              </span>
+            )}
           </button>
+
+          <div className="admin-profile">
+            {profile?.photoUrl ? (
+              <img
+                src={`${API_BASE_URL}${profile.photoUrl}`}
+                alt={profile.name}
+                className="sp-avatar-img"
+              />
+            ) : (
+              <div className="admin-avatar">
+                <i className="bi bi-person-fill"></i>
+              </div>
+            )}
+            <div>
+              <strong>{profile?.name || "Student"}</strong>
+              <small>Student · {profile?.course || "-"}</small>
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* Summary Cards */}
-      <section className="sp-stats-grid">
-        <div className="sp-stat-card">
-          <div>
-            <h3>My Course</h3>
-            <p className="sp-stat-value" style={{ fontSize: "18px" }}>
-              {profile?.course || "-"}
-            </p>
+      {/* Dashboard Overview Cards using existing stats-grid & stat-card */}
+      <section className="stats-grid">
+        <article className="stat-card">
+          <div className="stat-icon blue">
+            <i className="bi bi-book-fill"></i>
           </div>
-          <div className="sp-stat-icon" style={{ background: "#eff6ff", color: "#2563eb" }}>
-            <i className="bi bi-book-half"></i>
+          <div className="stat-content">
+            <p>Total Enrolled Courses</p>
+            <h2>{totalEnrolledCourses}</h2>
+            <small>{profile?.course || "No course assigned"}</small>
           </div>
-        </div>
+        </article>
 
-        <div className="sp-stat-card">
-          <div>
-            <h3>Pending Fees</h3>
-            <p className="sp-stat-value" style={{ color: "#dc2626" }}>
-              ₹{(fees?.remainingFees ?? 0).toLocaleString("en-IN")}
-            </p>
-          </div>
-          <div className="sp-stat-icon" style={{ background: "#fef2f2", color: "#dc2626" }}>
+        <article className="stat-card">
+          <div className="stat-icon pink">
             <i className="bi bi-wallet2"></i>
           </div>
-        </div>
-
-        <div className="sp-stat-card">
-          <div>
-            <h3>My Attendance</h3>
-            <p className="sp-stat-value" style={{ color: "#059669" }}>
-              {attendance?.attendancePercentage ?? 0}%
-            </p>
+          <div className="stat-content">
+            <p>Pending Fees</p>
+            <h2>₹{(fees?.remainingFees ?? 0).toLocaleString("en-IN")}</h2>
+            <small>
+              Total: ₹{(fees?.totalFees ?? 0).toLocaleString("en-IN")}
+            </small>
           </div>
-          <div className="sp-stat-icon" style={{ background: "#ecfdf5", color: "#059669" }}>
+        </article>
+
+        <article className="stat-card">
+          <div className="stat-icon green">
             <i className="bi bi-calendar-check-fill"></i>
           </div>
-        </div>
+          <div className="stat-content">
+            <p>Attendance Percentage</p>
+            <h2>{attendance?.attendancePercentage ?? 0}%</h2>
+            <small>
+              {attendance?.presentDays ?? 0} of {attendance?.totalDays ?? 0}{" "}
+              classes present
+            </small>
+          </div>
+        </article>
 
-        <div className="sp-stat-card">
-          <div>
-            <h3>Govt. Updates</h3>
-            <p className="sp-stat-value">{updates.length}</p>
+        <article className="stat-card">
+          <div className="stat-icon orange">
+            <i className="bi bi-megaphone-fill"></i>
           </div>
-          <div className="sp-stat-icon" style={{ background: "#fffbeb", color: "#d97706" }}>
-            <i className="bi bi-bell-fill"></i>
+          <div className="stat-content">
+            <p>New Govt. Notifications</p>
+            <h2>{unreadUpdatesCount}</h2>
+            <small>{updates.length} published updates</small>
           </div>
-        </div>
+        </article>
       </section>
 
-      {/* Navigation Tabs */}
-      <nav className="sp-tabs">
+      {/* Section Navigation Tabs */}
+      <nav className="sp-tabs" aria-label="Student Dashboard Sections">
         {(
           [
             { id: "overview", label: "Overview", icon: "bi-grid-fill" },
@@ -191,7 +243,11 @@ export default function StudentDashboard() {
             { id: "courses", label: "My Courses", icon: "bi-book" },
             { id: "fees", label: "My Fees", icon: "bi-currency-rupee" },
             { id: "attendance", label: "My Attendance", icon: "bi-calendar-check" },
-            { id: "updates", label: "Govt. Updates", icon: "bi-megaphone" },
+            {
+              id: "updates",
+              label: `Govt. Updates${unreadUpdatesCount > 0 ? ` (${unreadUpdatesCount})` : ""}`,
+              icon: "bi-megaphone",
+            },
           ] as { id: PortalTab; label: string; icon: string }[]
         ).map((tab) => (
           <button
@@ -207,11 +263,16 @@ export default function StudentDashboard() {
 
       {/* MY PROFILE */}
       {(activeTab === "overview" || activeTab === "profile") && profile && (
-        <section className="sp-panel">
-          <div className="sp-panel-header">
-            <h2>My Profile</h2>
+        <section className="panel" style={{ marginBottom: "20px" }}>
+          <div className="panel-header">
+            <div>
+              <h3>My Profile</h3>
+              <p>Your personal and admission information</p>
+            </div>
             <span
-              className={profile.isActive ? "sp-badge-present" : "sp-badge-absent"}
+              className={
+                profile.isActive ? "sp-badge-active" : "sp-badge-inactive"
+              }
             >
               {profile.isActive ? "Active Student" : "Inactive"}
             </span>
@@ -219,30 +280,38 @@ export default function StudentDashboard() {
 
           <div className="sp-profile-grid">
             <div className="sp-profile-item">
-              <div className="sp-profile-label">Full Name</div>
+              <div className="sp-profile-label">Student Name</div>
               <div className="sp-profile-value">{profile.name}</div>
             </div>
             <div className="sp-profile-item">
-              <div className="sp-profile-label">Mobile Number (Username)</div>
+              <div className="sp-profile-label">Mobile Number</div>
               <div className="sp-profile-value">{profile.mobile}</div>
             </div>
             <div className="sp-profile-item">
               <div className="sp-profile-label">Email</div>
-              <div className="sp-profile-value">{profile.email || "Not provided"}</div>
-            </div>
-            <div className="sp-profile-item">
-              <div className="sp-profile-label">Gender</div>
-              <div className="sp-profile-value">{profile.gender}</div>
+              <div className="sp-profile-value">
+                {profile.email || "Not provided"}
+              </div>
             </div>
             <div className="sp-profile-item">
               <div className="sp-profile-label">Address</div>
-              <div className="sp-profile-value">{profile.address || "Not provided"}</div>
+              <div className="sp-profile-value">
+                {profile.address || "Not provided"}
+              </div>
             </div>
             <div className="sp-profile-item">
               <div className="sp-profile-label">Admission Date</div>
               <div className="sp-profile-value">
-                {new Date(profile.admissionDate).toLocaleDateString("en-IN")}
+                {new Date(profile.admissionDate).toLocaleDateString("en-IN", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}
               </div>
+            </div>
+            <div className="sp-profile-item">
+              <div className="sp-profile-label">Gender</div>
+              <div className="sp-profile-value">{profile.gender}</div>
             </div>
           </div>
         </section>
@@ -250,87 +319,97 @@ export default function StudentDashboard() {
 
       {/* MY COURSES */}
       {(activeTab === "overview" || activeTab === "courses") && profile && (
-        <section className="sp-panel">
-          <div className="sp-panel-header">
-            <h2>My Enrolled Course</h2>
+        <section className="panel" style={{ marginBottom: "20px" }}>
+          <div className="panel-header">
+            <div>
+              <h3>My Courses</h3>
+              <p>Enrolled course details and status</p>
+            </div>
             <button
               type="button"
               className="sp-btn-secondary"
               onClick={() => navigate("/courses")}
             >
-              Browse All Active Courses
+              View Active Institute Courses
             </button>
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              gap: "18px",
-              alignItems: "center",
-              flexWrap: "wrap",
-              background: "#f8fafc",
-              border: "1px solid #e2e8f0",
-              borderRadius: "10px",
-              padding: "16px",
-            }}
-          >
-            <img
-              src={getCourseImage(profile.course)}
-              alt={profile.course}
-              style={{
-                width: "220px",
-                height: "125px",
-                objectFit: "cover",
-                borderRadius: "8px",
-                border: "1px solid #cbd5e1",
-              }}
-            />
-            <div style={{ flex: 1, minWidth: "220px" }}>
-              <h3 style={{ margin: "0 0 6px", color: "#0f172a" }}>{profile.course}</h3>
-              {profile.courseDetails ? (
-                <>
-                  <p style={{ margin: "0 0 6px", fontSize: "13px", color: "#475569" }}>
-                    Code: <strong>{profile.courseDetails.courseCode}</strong> · Duration:{" "}
-                    <strong>{profile.courseDetails.duration}</strong> · Fees:{" "}
-                    <strong>
-                      ₹{profile.courseDetails.courseFees.toLocaleString("en-IN")}
-                    </strong>
-                  </p>
-                  <p style={{ margin: 0, fontSize: "13px", color: "#64748b" }}>
-                    {profile.courseDetails.description ||
-                      "Practical computer training and certification."}
-                  </p>
-                </>
-              ) : (
-                <p style={{ margin: 0, fontSize: "13px", color: "#64748b" }}>
-                  You are currently enrolled in {profile.course}.
+          {!profile.course ? (
+            <p className="sp-empty-text">No course enrolled yet.</p>
+          ) : (
+            <div className="sp-course-box">
+              <img
+                src={getCourseImage(profile.course)}
+                alt={profile.course}
+                className="sp-course-img"
+              />
+              <div className="sp-course-info">
+                <h3>
+                  <span>{profile.course}</span>
+                  <span
+                    className={
+                      (profile.courseDetails?.status ?? "Active").toLowerCase() ===
+                      "active"
+                        ? "sp-badge-active"
+                        : "sp-badge-inactive"
+                    }
+                  >
+                    {profile.courseDetails?.status || "Active"}
+                  </span>
+                </h3>
+                <p style={{ margin: "0 0 6px", fontSize: "13px", color: "#475569" }}>
+                  Duration:{" "}
+                  <strong>
+                    {profile.courseDetails?.duration || "As per institute schedule"}
+                  </strong>
+                  {profile.courseDetails?.courseCode && (
+                    <>
+                      {" "}
+                      · Code: <strong>{profile.courseDetails.courseCode}</strong>
+                    </>
+                  )}
                 </p>
-              )}
+                <p style={{ margin: 0, fontSize: "13px", color: "#64748b" }}>
+                  {profile.courseDetails?.description ||
+                    `Enrolled in ${profile.course} at ICE Computer Institute.`}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </section>
       )}
 
       {/* MY FEES */}
       {(activeTab === "overview" || activeTab === "fees") && fees && (
-        <section className="sp-panel">
-          <div className="sp-panel-header">
-            <h2>My Fees &amp; Payment History</h2>
-            <div style={{ fontSize: "13px", color: "#475569" }}>
-              Total: <strong>₹{fees.totalFees.toLocaleString("en-IN")}</strong> · Paid:{" "}
-              <strong style={{ color: "#059669" }}>
-                ₹{fees.paidFees.toLocaleString("en-IN")}
-              </strong>{" "}
-              · Balance:{" "}
-              <strong style={{ color: "#dc2626" }}>
-                ₹{fees.remainingFees.toLocaleString("en-IN")}
-              </strong>
+        <section className="panel" style={{ marginBottom: "20px" }}>
+          <div className="panel-header">
+            <div>
+              <h3>My Fees</h3>
+              <p>Course fee summary and payment history</p>
+            </div>
+            <div className="sp-fees-strip">
+              <span>
+                Total Course Fees:{" "}
+                <strong>₹{fees.totalFees.toLocaleString("en-IN")}</strong>
+              </span>
+              <span>
+                Paid Amount:{" "}
+                <strong style={{ color: "#16a34a" }}>
+                  ₹{fees.paidFees.toLocaleString("en-IN")}
+                </strong>
+              </span>
+              <span>
+                Pending Amount:{" "}
+                <strong style={{ color: "#ea580c" }}>
+                  ₹{fees.remainingFees.toLocaleString("en-IN")}
+                </strong>
+              </span>
             </div>
           </div>
 
           {fees.payments.length === 0 ? (
-            <p style={{ color: "#64748b", fontSize: "13px", margin: 0 }}>
-              No fee payment receipts recorded yet.
+            <p className="sp-empty-text">
+              No fee payment history recorded yet.
             </p>
           ) : (
             <div className="sp-table-wrap">
@@ -340,7 +419,7 @@ export default function StudentDashboard() {
                     <th>Receipt ID</th>
                     <th>Payment Date</th>
                     <th>Amount Paid</th>
-                    <th>Mode</th>
+                    <th>Payment Mode</th>
                     <th>Notes</th>
                   </tr>
                 </thead>
@@ -348,8 +427,10 @@ export default function StudentDashboard() {
                   {fees.payments.map((p) => (
                     <tr key={p.id}>
                       <td>#{p.id}</td>
-                      <td>{new Date(p.paymentDate).toLocaleDateString("en-IN")}</td>
-                      <td style={{ fontWeight: 700, color: "#059669" }}>
+                      <td>
+                        {new Date(p.paymentDate).toLocaleDateString("en-IN")}
+                      </td>
+                      <td style={{ fontWeight: 700, color: "#16a34a" }}>
                         ₹{p.amountPaid.toLocaleString("en-IN")}
                       </td>
                       <td>{p.paymentMode}</td>
@@ -364,64 +445,90 @@ export default function StudentDashboard() {
       )}
 
       {/* MY ATTENDANCE */}
-      {(activeTab === "overview" || activeTab === "attendance") && attendance && (
-        <section className="sp-panel">
-          <div className="sp-panel-header">
-            <h2>My Attendance</h2>
-            <div style={{ fontSize: "13px", color: "#475569" }}>
-              Total Days: <strong>{attendance.totalDays}</strong> · Present:{" "}
-              <strong style={{ color: "#059669" }}>{attendance.presentDays}</strong> ·
-              Absent:{" "}
-              <strong style={{ color: "#dc2626" }}>{attendance.absentDays}</strong>
+      {(activeTab === "overview" || activeTab === "attendance") &&
+        attendance && (
+          <section className="panel" style={{ marginBottom: "20px" }}>
+            <div className="panel-header">
+              <div>
+                <h3>My Attendance</h3>
+                <p>Class attendance summary and daily records</p>
+              </div>
+              <div className="sp-fees-strip">
+                <span>
+                  Total Classes: <strong>{attendance.totalDays}</strong>
+                </span>
+                <span>
+                  Present Days:{" "}
+                  <strong style={{ color: "#16a34a" }}>
+                    {attendance.presentDays}
+                  </strong>
+                </span>
+                <span>
+                  Absent Days:{" "}
+                  <strong style={{ color: "#ea580c" }}>
+                    {attendance.absentDays}
+                  </strong>
+                </span>
+                <span>
+                  Percentage:{" "}
+                  <strong>{attendance.attendancePercentage}%</strong>
+                </span>
+              </div>
             </div>
-          </div>
 
-          {attendance.records.length === 0 ? (
-            <p style={{ color: "#64748b", fontSize: "13px", margin: 0 }}>
-              No attendance records marked yet.
-            </p>
-          ) : (
-            <div className="sp-table-wrap">
-              <table className="sp-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Remarks</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {attendance.records.map((item) => (
-                    <tr key={item.id}>
-                      <td>
-                        {new Date(item.attendanceDate).toLocaleDateString("en-IN")}
-                      </td>
-                      <td>
-                        <span
-                          className={
-                            item.status.toLowerCase() === "present"
-                              ? "sp-badge-present"
-                              : "sp-badge-absent"
-                          }
-                        >
-                          {item.status}
-                        </span>
-                      </td>
-                      <td>{item.remarks || "-"}</td>
+            {attendance.records.length === 0 ? (
+              <p className="sp-empty-text">
+                No attendance records marked yet.
+              </p>
+            ) : (
+              <div className="sp-table-wrap">
+                <table className="sp-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Status</th>
+                      <th>Remarks</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-      )}
+                  </thead>
+                  <tbody>
+                    {attendance.records.map((item) => (
+                      <tr key={item.id}>
+                        <td>
+                          {new Date(item.attendanceDate).toLocaleDateString(
+                            "en-IN"
+                          )}
+                        </td>
+                        <td>
+                          <span
+                            className={
+                              item.status.toLowerCase() === "present"
+                                ? "sp-badge-active"
+                                : "sp-badge-inactive"
+                            }
+                          >
+                            {item.status}
+                          </span>
+                        </td>
+                        <td>{item.remarks || "-"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
 
       {/* GOVERNMENT UPDATES & NOTIFICATIONS */}
       {(activeTab === "overview" || activeTab === "updates") && (
-        <section className="sp-panel">
-          <div className="sp-panel-header">
-            <h2>Government Updates &amp; Notifications</h2>
+        <section className="panel" style={{ marginBottom: "20px" }}>
+          <div className="panel-header">
+            <div>
+              <h3>Government Updates &amp; Notifications</h3>
+              <p>
+                Latest jobs, exam forms, scholarships, and admission alerts
+              </p>
+            </div>
             <button
               type="button"
               className="sp-btn-primary"
@@ -432,8 +539,8 @@ export default function StudentDashboard() {
           </div>
 
           {updates.length === 0 ? (
-            <p style={{ color: "#64748b", fontSize: "13px", margin: 0 }}>
-              No government updates published yet.
+            <p className="sp-empty-text">
+              No government updates have been published yet.
             </p>
           ) : (
             <div className="sp-table-wrap">
@@ -444,42 +551,19 @@ export default function StudentDashboard() {
                     <th>Category</th>
                     <th>Start Date</th>
                     <th>Last Date</th>
-                    <th>Action</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {updates.slice(0, 6).map((item) => {
+                  {updates.slice(0, 8).map((item) => {
                     const isNew = isUpdateUnread(item, readIds);
                     return (
                       <tr key={item.id}>
                         <td>
-                          <strong>{item.title}</strong>{" "}
-                          {isNew && (
-                            <span
-                              style={{
-                                background: "#2563eb",
-                                color: "#fff",
-                                fontSize: "10px",
-                                padding: "2px 6px",
-                                borderRadius: "10px",
-                                marginLeft: "6px",
-                              }}
-                            >
-                              NEW
-                            </span>
-                          )}
+                          <strong>{item.title}</strong>
+                          {isNew && <span className="sp-badge-new">NEW</span>}
                           {item.isImportant && (
-                            <span
-                              style={{
-                                background: "#fef2f2",
-                                color: "#dc2626",
-                                border: "1px solid #fecaca",
-                                fontSize: "10px",
-                                padding: "1px 6px",
-                                borderRadius: "10px",
-                                marginLeft: "6px",
-                              }}
-                            >
+                            <span className="sp-badge-important">
                               IMPORTANT
                             </span>
                           )}
@@ -487,27 +571,46 @@ export default function StudentDashboard() {
                         <td>{item.category}</td>
                         <td>
                           {item.applicationStartDate
-                            ? new Date(item.applicationStartDate).toLocaleDateString(
-                                "en-IN"
-                              )
+                            ? new Date(
+                                item.applicationStartDate
+                              ).toLocaleDateString("en-IN")
                             : "-"}
                         </td>
                         <td>
                           {item.applicationLastDate
-                            ? new Date(item.applicationLastDate).toLocaleDateString(
-                                "en-IN"
-                              )
+                            ? new Date(
+                                item.applicationLastDate
+                              ).toLocaleDateString("en-IN")
                             : "-"}
                         </td>
                         <td>
-                          <button
-                            type="button"
-                            className="sp-btn-secondary"
-                            style={{ padding: "5px 10px", fontSize: "12px" }}
-                            onClick={() => navigate("/govt-updates")}
-                          >
-                            View
-                          </button>
+                          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                            <button
+                              type="button"
+                              className="sp-btn-secondary"
+                              style={{ padding: "5px 10px", fontSize: "12px" }}
+                              onClick={() => {
+                                setReadIds(markUpdateAsRead(item.id));
+                                navigate("/govt-updates");
+                              }}
+                            >
+                              Details
+                            </button>
+                            {item.officialLink && (
+                              <a
+                                href={item.officialLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="sp-btn-primary"
+                                style={{ padding: "5px 10px", fontSize: "12px" }}
+                                onClick={() =>
+                                  setReadIds(markUpdateAsRead(item.id))
+                                }
+                              >
+                                Apply <i className="bi bi-box-arrow-up-right"></i>
+                              </a>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );

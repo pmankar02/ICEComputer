@@ -62,8 +62,12 @@ function Dashboard() {
   useEffect(() => {
     async function loadStudentCount() {
       try {
+        const token = localStorage.getItem("token");
         const response = await fetch(
-          `${API_BASE_URL}/api/students`
+          `${API_BASE_URL}/api/students`,
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          }
         );
 
         if (!response.ok) {

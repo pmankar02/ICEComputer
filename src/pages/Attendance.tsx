@@ -40,8 +40,11 @@ export default function Attendance() {
     setError("");
 
     try {
+      const token = localStorage.getItem("token");
       const [studentResponse, attendanceResponse] = await Promise.all([
-        fetch(STUDENT_API),
+        fetch(STUDENT_API, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        }),
         fetch(`${ATTENDANCE_API}/date/${attendanceDate}`),
       ]);
 
