@@ -1,0 +1,402 @@
+/* =========================================================
+   Global Dark Mode Theme Overrides
+   Applied via <html data-theme="dark">
+   Light Mode remains the default with zero layout changes.
+   ========================================================= */
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] body,
+html[data-theme="dark"] #root {
+  background-color: #0b1120;
+  color: #e2e8f0;
+}
+
+/* Main Layout & Sidebar */
+html[data-theme="dark"] .app-layout,
+html[data-theme="dark"] .dashboard-layout,
+html[data-theme="dark"] .courses-page,
+html[data-theme="dark"] .attendance-page,
+html[data-theme="dark"] .fees-page,
+html[data-theme="dark"] .govt-updates-page,
+html[data-theme="dark"] .students-page,
+html[data-theme="dark"] .payment-history-page,
+html[data-theme="dark"] .insights-page,
+html[data-theme="dark"] .ai-page,
+html[data-theme="dark"] .user-management,
+html[data-theme="dark"] .student-portal,
+html[data-theme="dark"] .reports-page {
+  background: #0b1120;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .app-content,
+html[data-theme="dark"] .dashboard-main {
+  background: #0b1120;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .dashboard-main::before {
+  background-image: url("../assets/dashboard-bg-dark.svg");
+  opacity: 0.24;
+}
+
+html[data-theme="dark"] .app-sidebar {
+  background: #080f1d;
+  border-right: 1px solid #1e293b;
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .app-brand,
+html[data-theme="dark"] .app-sidebar-footer {
+  border-color: #1e293b;
+}
+
+html[data-theme="dark"] .app-nav-link {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .app-nav-link:hover,
+html[data-theme="dark"] .app-nav-link.active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .app-logout-button {
+  background: #131c31;
+  color: #e2e8f0;
+  border-color: #1e293b;
+}
+
+html[data-theme="dark"] .app-logout-button:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+/* Headings & Muted Text */
+html[data-theme="dark"] .topbar h1,
+html[data-theme="dark"] .courses-title-group h1,
+html[data-theme="dark"] .attendance-header h1,
+html[data-theme="dark"] .ai-header h1,
+html[data-theme="dark"] .insights-header h1,
+html[data-theme="dark"] .fees-header h1,
+html[data-theme="dark"] .gu-title-group h1,
+html[data-theme="dark"] .students-heading h1,
+html[data-theme="dark"] .um-title,
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] h5,
+html[data-theme="dark"] h6,
+html[data-theme="dark"] strong {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"] .topbar p,
+html[data-theme="dark"] .panel-header p,
+html[data-theme="dark"] .page-description,
+html[data-theme="dark"] .um-subtitle,
+html[data-theme="dark"] .students-heading p,
+html[data-theme="dark"] .students-toolbar p,
+html[data-theme="dark"] .courses-title-group p,
+html[data-theme="dark"] .gu-title-group p,
+html[data-theme="dark"] .fees-header p,
+html[data-theme="dark"] .attendance-header p,
+html[data-theme="dark"] .insights-header p,
+html[data-theme="dark"] .ai-header p,
+html[data-theme="dark"] .admin-profile small,
+html[data-theme="dark"] .stat-content p,
+html[data-theme="dark"] .stat-content small {
+  color: #94a3b8;
+}
+
+/* Header Action Buttons & Admin Dropdown */
+html[data-theme="dark"] .notification-button,
+html[data-theme="dark"] .theme-toggle-button {
+  background: #131c31;
+  color: #e2e8f0;
+  border: 1px solid #1e293b;
+}
+
+html[data-theme="dark"] .notification-button:hover,
+html[data-theme="dark"] .theme-toggle-button:hover {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .theme-toggle-button i.bi-sun-fill {
+  color: #fbbf24;
+}
+
+html[data-theme="dark"] .admin-avatar {
+  background: #1e3a8a;
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .admin-profile-trigger:hover {
+  background: #131c31;
+}
+
+html[data-theme="dark"] .admin-dropdown {
+  background: #131c31;
+  border-color: #1e293b;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"] .admin-dropdown-header {
+  border-bottom-color: #1e293b;
+}
+
+html[data-theme="dark"] .admin-dropdown-header small {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .admin-dropdown-item {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .admin-dropdown-item:hover {
+  background: #1e293b;
+}
+
+/* Cards, Panels, & Containers across all modules */
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .student-form,
+html[data-theme="dark"] .students-table-card,
+html[data-theme="dark"] .attendance-card,
+html[data-theme="dark"] .attendance-panel,
+html[data-theme="dark"] .fees-card,
+html[data-theme="dark"] .fees-panel,
+html[data-theme="dark"] .fees-table-card,
+html[data-theme="dark"] .payment-card,
+html[data-theme="dark"] .um-stat-card,
+html[data-theme="dark"] .um-table-card,
+html[data-theme="dark"] .um-card,
+html[data-theme="dark"] .course-card,
+html[data-theme="dark"] .summary-card,
+html[data-theme="dark"] .courses-summary-card,
+html[data-theme="dark"] .courses-table-card,
+html[data-theme="dark"] .courses-filter-card,
+html[data-theme="dark"] .courses-empty,
+html[data-theme="dark"] .courses-toolbar,
+html[data-theme="dark"] .courses-filter-bar,
+html[data-theme="dark"] .view-mode-toggle,
+html[data-theme="dark"] .attendance-toolbar,
+html[data-theme="dark"] .gu-summary-card,
+html[data-theme="dark"] .gu-card,
+html[data-theme="dark"] .gu-table-card,
+html[data-theme="dark"] .insight-card,
+html[data-theme="dark"] .insights-panel,
+html[data-theme="dark"] .ai-welcome,
+html[data-theme="dark"] .ai-card,
+html[data-theme="dark"] .sp-card,
+html[data-theme="dark"] .sp-profile-item,
+html[data-theme="dark"] .sp-course-box,
+html[data-theme="dark"] .sp-summary-card,
+html[data-theme="dark"] .sp-table-card,
+html[data-theme="dark"] .reports-category-card,
+html[data-theme="dark"] .reports-filter-card,
+html[data-theme="dark"] .reports-summary-card,
+html[data-theme="dark"] .reports-breakdown-card,
+html[data-theme="dark"] .reports-table-card,
+html[data-theme="dark"] .reports-chip {
+  background: #131c31;
+  border-color: #1e293b;
+  color: #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"] .reports-category-card.active {
+  background: #1e3a8a;
+  border-color: #3b82f6;
+}
+
+html[data-theme="dark"] .reports-btn-secondary,
+html[data-theme="dark"] .reports-subtabs button:not(.active) {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+
+/* Tables */
+html[data-theme="dark"] table,
+html[data-theme="dark"] .table {
+  color: #e2e8f0;
+  --bs-table-bg: transparent;
+  --bs-table-color: #e2e8f0;
+  --bs-table-border-color: #1e293b;
+  --bs-table-hover-bg: #1e293b;
+  --bs-table-hover-color: #ffffff;
+}
+
+html[data-theme="dark"] thead,
+html[data-theme="dark"] th {
+  background: #0f172a !important;
+  color: #cbd5e1 !important;
+  border-color: #1e293b !important;
+}
+
+html[data-theme="dark"] td {
+  border-color: #1e293b !important;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] tbody tr:hover {
+  background: #1a2640 !important;
+}
+
+/* Forms, Inputs, Selects, & Textareas */
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] .form-select {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+  border-color: #334155 !important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #64748b !important;
+}
+
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] select:focus,
+html[data-theme="dark"] textarea:focus,
+html[data-theme="dark"] .form-control:focus,
+html[data-theme="dark"] .form-select:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25) !important;
+}
+
+html[data-theme="dark"] label {
+  color: #cbd5e1;
+}
+
+/* Secondary / Toolbar Buttons */
+html[data-theme="dark"] .secondary-button,
+html[data-theme="dark"] .btn-course-secondary,
+html[data-theme="dark"] .btn-gu-secondary,
+html[data-theme="dark"] .um-btn-secondary,
+html[data-theme="dark"] .sp-btn-secondary,
+html[data-theme="dark"] .sp-tab-btn:not(.active),
+html[data-theme="dark"] .view-toggle-btn:not(.active),
+html[data-theme="dark"] .insights-refresh {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .secondary-button:hover,
+html[data-theme="dark"] .btn-course-secondary:hover,
+html[data-theme="dark"] .btn-gu-secondary:hover,
+html[data-theme="dark"] .um-btn-secondary:hover,
+html[data-theme="dark"] .sp-btn-secondary:hover,
+html[data-theme="dark"] .insights-refresh:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+/* Modals */
+html[data-theme="dark"] .modal-content,
+html[data-theme="dark"] .um-modal,
+html[data-theme="dark"] .course-modal,
+html[data-theme="dark"] .courses-modal-card,
+html[data-theme="dark"] .courses-modal-header,
+html[data-theme="dark"] .courses-modal-footer,
+html[data-theme="dark"] .gu-modal {
+  background: #131c31;
+  color: #e2e8f0;
+  border: 1px solid #1e293b;
+}
+
+html[data-theme="dark"] .summary-info h3,
+html[data-theme="dark"] .gu-summary-info h3 {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .summary-value,
+html[data-theme="dark"] .gu-summary-value {
+  color: #f8fafc;
+}
+
+html[data-theme="dark"] .view-toggle-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .modal-header,
+html[data-theme="dark"] .modal-footer {
+  border-color: #1e293b;
+}
+
+html[data-theme="dark"] .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Login Page */
+html[data-theme="dark"] .login-page {
+  background: #0b1120;
+}
+
+html[data-theme="dark"] .login-card {
+  background: #131c31;
+  border: 1px solid #1e293b;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .login-card h2 {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"] .login-subtitle {
+  color: #94a3b8;
+}
+
+/* Floating AI Assistant Window */
+html[data-theme="dark"] .floating-ai-window {
+  background: #131c31;
+  border-color: #1e293b;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .floating-ai-messages {
+  background: #0f172a;
+}
+
+html[data-theme="dark"] .floating-ai-msg.assistant .floating-ai-msg-bubble {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .floating-ai-chip {
+  background: #1e293b;
+  color: #cbd5e1;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .floating-ai-input-area {
+  background: #131c31;
+  border-top-color: #1e293b;
+}
+
+/* Chart Grid & Empty States */
+html[data-theme="dark"] .chart-grid span {
+  color: #64748b;
+  border-bottom-color: #1e293b;
+}
+
+html[data-theme="dark"] .bar-column span {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .payment-empty,
+html[data-theme="dark"] .empty-state {
+  color: #94a3b8;
+}

@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" fill="none">
+  <defs>
+    <linearGradient id="lightBgGrad" x1="0" y1="0" x2="1440" y2="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="55%" stop-color="#eff6ff" />
+      <stop offset="100%" stop-color="#dbeafe" />
+    </linearGradient>
+    <pattern id="lightGrid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" stroke="#bfdbfe" stroke-width="0.8" opacity="0.55" />
+    </pattern>
+  </defs>
+
+  <rect width="1440" height="900" fill="url(#lightBgGrad)" />
+  <rect width="1440" height="900" fill="url(#lightGrid)" />
+
+  <!-- Digital Network Mesh (Left & Top) -->
+  <g stroke="#3b82f6" stroke-width="1.6" opacity="0.55">
+    <line x1="120" y1="150" x2="290" y2="95" />
+    <line x1="290" y1="95" x2="470" y2="190" />
+    <line x1="120" y1="150" x2="220" y2="310" />
+    <line x1="220" y1="310" x2="470" y2="190" />
+    <line x1="470" y1="190" x2="660" y2="120" />
+    <line x1="220" y1="310" x2="380" y2="440" />
+    <line x1="940" y1="130" x2="1120" y2="210" />
+    <line x1="1120" y1="210" x2="1310" y2="120" />
+    <line x1="1120" y1="210" x2="1260" y2="360" />
+    <line x1="940" y1="130" x2="840" y2="270" />
+  </g>
+  <g fill="#2563eb" opacity="0.7">
+    <circle cx="120" cy="150" r="5" />
+    <circle cx="290" cy="95" r="6" />
+    <circle cx="470" cy="190" r="5" />
+    <circle cx="220" cy="310" r="5" />
+    <circle cx="660" cy="120" r="4.5" />
+    <circle cx="380" cy="440" r="4.5" />
+    <circle cx="940" cy="130" r="5" />
+    <circle cx="1120" cy="210" r="6" />
+    <circle cx="1310" cy="120" r="5" />
+    <circle cx="1260" cy="360" r="4.5" />
+    <circle cx="840" cy="270" r="4.5" />
+  </g>
+
+  <!-- Circuit Traces (Bottom Left) -->
+  <g stroke="#60a5fa" stroke-width="2" stroke-linecap="round" opacity="0.65">
+    <path d="M 60 740 H 190 L 235 695 H 350" />
+    <path d="M 60 780 H 240 L 285 735 H 410" />
+    <path d="M 110 830 H 300 L 340 790 H 460" />
+    <circle cx="350" cy="695" r="5" fill="#93c5fd" />
+    <circle cx="410" cy="735" r="5" fill="#93c5fd" />
+    <circle cx="460" cy="790" r="5" fill="#93c5fd" />
+  </g>
+
+  <!-- Laptop Illustration (Bottom Right) -->
+  <g transform="translate(960, 500)" opacity="0.75">
+    <rect x="40" y="10" width="320" height="205" rx="14" fill="#eff6ff" stroke="#3b82f6" stroke-width="3" />
+    <rect x="56" y="26" width="288" height="173" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5" />
+    <!-- Code Lines on Laptop Screen -->
+    <line x1="76" y1="54" x2="156" y2="54" stroke="#2563eb" stroke-width="4" stroke-linecap="round" />
+    <line x1="76" y1="76" x2="230" y2="76" stroke="#60a5fa" stroke-width="3.5" stroke-linecap="round" />
+    <line x1="96" y1="98" x2="265" y2="98" stroke="#93c5fd" stroke-width="3.5" stroke-linecap="round" />
+    <line x1="96" y1="120" x2="215" y2="120" stroke="#60a5fa" stroke-width="3.5" stroke-linecap="round" />
+    <line x1="76" y1="142" x2="180" y2="142" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round" />
+    <line x1="76" y1="164" x2="245" y2="164" stroke="#93c5fd" stroke-width="3.5" stroke-linecap="round" />
+    <!-- Laptop Base -->
+    <path d="M 10 218 H 390 L 415 244 H -15 L 10 218 Z" fill="#dbeafe" stroke="#3b82f6" stroke-width="2.5" />
+    <rect x="165" y="226" width="70" height="6" rx="3" fill="#60a5fa" />
+  </g>
+
+  <!-- Terminal / Code Window (Top Center-Right) -->
+  <g transform="translate(640, 250)" opacity="0.6">
+    <rect x="0" y="0" width="240" height="150" rx="10" fill="#ffffff" stroke="#60a5fa" stroke-width="2" />
+    <line x1="0" y1="30" x2="240" y2="30" stroke="#93c5fd" stroke-width="1.5" />
+    <circle cx="18" cy="15" r="4" fill="#60a5fa" />
+    <circle cx="32" cy="15" r="4" fill="#93c5fd" />
+    <circle cx="46" cy="15" r="4" fill="#bfdbfe" />
+    <text x="20" y="64" font-family="monospace" font-size="18" font-weight="700" fill="#2563eb">&lt;ICE /&gt;</text>
+    <line x1="20" y1="86" x2="185" y2="86" stroke="#93c5fd" stroke-width="3" stroke-linecap="round" />
+    <line x1="20" y1="106" x2="145" y2="106" stroke="#bfdbfe" stroke-width="3" stroke-linecap="round" />
+    <line x1="20" y1="126" x2="205" y2="126" stroke="#93c5fd" stroke-width="3" stroke-linecap="round" />
+  </g>
+
+  <!-- Microchip / CPU Element (Middle Left) -->
+  <g transform="translate(110, 440)" stroke="#3b82f6" stroke-width="2" opacity="0.6">
+    <rect x="24" y="24" width="72" height="72" rx="10" fill="#eff6ff" />
+    <rect x="40" y="40" width="40" height="40" rx="5" fill="#dbeafe" />
+    <line x1="42" y1="6" x2="42" y2="24" />
+    <line x1="60" y1="6" x2="60" y2="24" />
+    <line x1="78" y1="6" x2="78" y2="24" />
+    <line x1="42" y1="96" x2="42" y2="114" />
+    <line x1="60" y1="96" x2="60" y2="114" />
+    <line x1="78" y1="96" x2="78" y2="114" />
+    <line x1="6" y1="42" x2="24" y2="42" />
+    <line x1="6" y1="60" x2="24" y2="60" />
+    <line x1="6" y1="78" x2="24" y2="78" />
+    <line x1="96" y1="42" x2="114" y2="42" />
+    <line x1="96" y1="60" x2="114" y2="60" />
+    <line x1="96" y1="78" x2="114" y2="78" />
+  </g>
+
+  <!-- Coding Symbols -->
+  <g font-family="monospace" font-weight="700" fill="#2563eb" opacity="0.5">
+    <text x="510" y="110" font-size="34">&lt;/&gt;</text>
+    <text x="1180" y="290" font-size="32">{ }</text>
+    <text x="530" y="760" font-size="30">( ) =&gt;</text>
+    <text x="840" y="640" font-size="24">010110</text>
+    <text x="310" y="560" font-size="26">[ ]</text>
+  </g>
+</svg>

@@ -1,5 +1,5 @@
 /* =========================================================
-   Floating WhatsApp Chat Button (Pill Design)
+   Floating WhatsApp Chat Button (Circular Icon Design)
    ========================================================= */
 
 .floating-whatsapp-pill-btn {
@@ -7,29 +7,58 @@
   bottom: 24px;
   right: 24px;
   z-index: 9998;
+  width: 54px;
+  height: 54px;
+  padding: 0;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 18px;
+  justify-content: center;
   background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
   color: #ffffff;
-  border-radius: 9999px;
+  border-radius: 50%;
   box-shadow: 0 8px 24px rgba(37, 211, 102, 0.42), 0 2px 6px rgba(0, 0, 0, 0.08);
   text-decoration: none;
   font-family: inherit;
   user-select: none;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.25s ease;
 }
 
 .floating-whatsapp-pill-btn:hover {
-  transform: translateY(-3px) scale(1.02);
+  transform: translateY(-3px) scale(1.06);
   box-shadow: 0 12px 28px rgba(37, 211, 102, 0.52), 0 4px 10px rgba(0, 0, 0, 0.12);
   background: linear-gradient(135deg, #22bf5b 0%, #0e7065 100%);
   color: #ffffff;
 }
 
 .floating-whatsapp-pill-btn:active {
-  transform: translateY(0) scale(0.98);
+  transform: translateY(0) scale(0.96);
+}
+
+/* Hover Tooltip */
+.floating-whatsapp-pill-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%) translateX(4px);
+  padding: 6px 11px;
+  border-radius: 8px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.floating-whatsapp-pill-btn:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
 }
 
 /* Icon */
@@ -39,33 +68,27 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  font-size: 20px;
+  font-size: 24px;
   color: #ffffff;
 }
 
-/* Text */
-.floating-whatsapp-text {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-  white-space: nowrap;
-  color: #ffffff;
-}
-
-/* Notification Badge ("3" from reference image) */
+/* Notification Badge */
 .floating-whatsapp-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
   background: #ffffff;
   color: #128c7e;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   border-radius: 9999px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   animation: floating-whatsapp-badge-pulse 2s infinite;
 }
 
@@ -83,24 +106,20 @@
   .floating-whatsapp-pill-btn {
     bottom: 16px;
     right: 16px;
-    padding: 8px 14px;
-    gap: 8px;
+    width: 48px;
+    height: 48px;
   }
 
   .floating-whatsapp-icon-wrapper {
     width: 24px;
     height: 24px;
-    font-size: 18px;
-  }
-
-  .floating-whatsapp-text {
-    font-size: 13px;
+    font-size: 21px;
   }
 
   .floating-whatsapp-badge {
-    min-width: 19px;
-    height: 19px;
-    font-size: 11px;
+    min-width: 18px;
+    height: 18px;
+    font-size: 10px;
     padding: 0 4px;
   }
 }

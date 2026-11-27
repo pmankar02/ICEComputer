@@ -17,8 +17,6 @@ const menuItems = [
   { label: "Govt. Updates", path: "/govt-updates", icon: "bi-megaphone-fill" },
   { label: "Fees", path: "/fees", icon: "bi-wallet2" },
   { label: "Attendance", path: "/attendance", icon: "bi-calendar-check" },
-  { label: "Online Services", path: "/services", icon: "bi-file-earmark-text" },
-  { label: "Net Cafe", path: "/netcafe", icon: "bi-pc-display" },
   { label: "Inventory", path: "/inventory", icon: "bi-box-seam" },
   { label: "Reports", path: "/reports", icon: "bi-bar-chart" },
   { label: "Users & Roles", path: "/user-management", icon: "bi-person-gear" },
@@ -87,6 +85,7 @@ function MainLayout() {
         { label: "My Dashboard", path: "/student-dashboard", icon: "bi-grid-fill" },
         { label: "Courses", path: "/courses", icon: "bi-book" },
         { label: "Govt. Updates", path: "/govt-updates", icon: "bi-megaphone-fill" },
+        { label: "Reports", path: "/reports", icon: "bi-bar-chart" },
       ]
     : menuItems.filter((item) => {
         if (item.label === "Fees" || item.label === "Users & Roles") {

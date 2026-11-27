@@ -82,26 +82,87 @@ Previously, running the project in Visual Studio only started the backend API (`
 
 ---
 
-## 5. File Summary
+## 5. Dynamic API Base URL Configuration
+
+### What Was Done
+* Created **`ICEComputer.client/src/config/apiConfig.ts`** exporting `API_BASE_URL`:
+  - Uses `http://localhost:5056` when running on `localhost`.
+  - Uses `window.location.origin` when hosted on a remote domain.
+* Updated API service and page modules (`api.ts`, `FloatingAIAssistant.tsx`, `PaymentHistory.tsx`, `StudentInsights.tsx`, `AIAssistant.tsx`, `UserManagement.tsx`, `Login.tsx`, and service files) to use `API_BASE_URL` instead of hardcoded localhost URLs.
+
+---
+
+## 6. Courses Management Module
+
+### Backend (`ICEComputer.API`)
+* Added **`Models/Course.cs`**, **`DTOs/CourseDtos.cs`**, and EF Core migration **`20261124104719_AddCoursesTable`**.
+* Added **`Controllers/CoursesController.cs`** (`api/Courses`) supporting search, status filtering, and CRUD operations:
+  - `SuperAdmin`, `AdminStaff`, and `Faculty` can view all courses and manage course records.
+  - `Student` users can view active courses only.
+
+### Frontend (`ICEComputer.client`)
+* Added **`src/services/courseService.ts`**, **`src/pages/Courses.tsx`**, and **`src/pages/Courses.css`** with route `/courses` in `App.tsx` and sidebar link in `MainLayout.tsx`.
+* Added course SVG assets in **`public/course-images/`** (`mscit.svg`, `tally.svg`, `typing-marathi.svg`, `typing-english.svg`, `data-entry.svg`, `html-css.svg`, `advanced-excel.svg`, `cyber-security.svg`, `default-course.svg`).
+
+---
+
+## 7. Government Updates & Schemes Module
+
+### Backend (`ICEComputer.API`)
+* Added **`Models/GovernmentUpdate.cs`**, **`DTOs/GovernmentUpdateDtos.cs`**, and EF Core migration **`20261125044557_AddGovernmentUpdatesTable`**.
+* Added **`Controllers/GovernmentUpdatesController.cs`** (`api/GovernmentUpdates`) with CRUD, publish/important flags, and file attachment upload/cleanup in `wwwroot/government-updates/`.
+
+### Frontend (`ICEComputer.client`)
+* Added **`src/services/govtUpdateService.ts`**, **`src/pages/GovtUpdates.tsx`**, and **`src/pages/GovtUpdates.css`** with route `/govt-updates` in `App.tsx`.
+* Added unread update tracking and notification badge in **`MainLayout.tsx`** and updates integration in **`Dashboard.tsx`**.
+
+---
+
+## 8. Student Portal, Account Linking & First-Login Password Change
+
+### Backend (`ICEComputer.API`)
+* Added EF Core migration **`20261125063701_AddStudentAccountFields`** and updated **`Models/Student.cs`**, **`Identity/ApplicationUser.cs`**, and **`Data/ApplicationDbContext.cs`** to link student records to Identity user accounts.
+* Updated **`Controllers/StudentsController.cs`** and **`Controllers/AuthController.cs`** for student account creation and mandatory first-login password change (`mustChangePassword`).
+* Added **`Controllers/StudentPortalController.cs`** (`api/StudentPortal`, restricted to `Student` role) with:
+  - `GET /api/StudentPortal/my-profile` (student details & enrolled course info)
+  - `GET /api/StudentPortal/my-fees` (fee summary & payment history)
+  - `GET /api/StudentPortal/my-attendance` (attendance percentage & records)
+
+### Frontend (`ICEComputer.client`)
+* Added **`src/services/studentPortalService.ts`**, **`src/pages/StudentDashboard.tsx`**, and **`src/pages/StudentDashboard.css`** mapped to `/student-dashboard` for `Student` role.
+* Added **`src/pages/ChangePassword.tsx`** mapped to `/change-password`, enforced by `ProtectedRoute` in `App.tsx` when `mustChangePassword` is `true`.
+* Updated **`MainLayout.tsx`** to render a dedicated Student sidebar (`My Dashboard`, `Courses`, `Govt. Updates`).
+
+---
+
+## 9. Sidebar Navigation Cleanup
+
+* Removed **Online Services** (`/services`) and **Net Cafe** (`/netcafe`) menu items from `menuItems` in **`ICEComputer.client/src/layouts/MainLayout.tsx`**.
+
+---
+
+## 10. File Summary
 
 | File | Purpose / Change |
 | :--- | :--- |
 | **`ICEComputer.sln`** | Visual Studio solution connecting Backend API and Frontend Client. |
-| **`ICEComputer.API/Program.cs`** | Added automated background launch of Vite dev server during development. |
+| **`ICEComputer.API/Program.cs`** | Automated background launch of Vite dev server during development and static/SPA hosting configuration. |
 | **`ICEComputer.client/vite.config.ts`** | Enabled `port: 5173`, `host: true`, and `open: true` (auto-opens login page in browser). |
 | **`ICEComputer.client/package.json`** | Added `"start": "vite"` script for IDE compatibility. |
 | **`ICEComputer.client/Properties/launchSettings.json`** | Added Chrome/Edge launch profiles for Visual Studio. |
-| **`src/components/FloatingWhatsApp.tsx`** | Floating WhatsApp contact button component. |
-| **`src/components/FloatingWhatsApp.css`** | Styling, gradient, and responsive rules for WhatsApp button. |
-| **`src/components/FloatingAIAssistant.tsx`** | Floating AI Assistant chat popup widget. |
-| **`src/components/FloatingAIAssistant.css`** | Positioning, chat bubbles, and animations for AI Assistant. |
-| **`src/layouts/MainLayout.tsx`** | Mounted WhatsApp & AI buttons; hidden restricted menu items from non-SuperAdmin. |
-| **`src/App.tsx`** | Route protection rules with `allowedRoles` for sensitive pages. |
+| **`src/config/apiConfig.ts`** | Dynamic `API_BASE_URL` for local development vs. hosted origin. |
+| **`src/components/FloatingWhatsApp.tsx` / `.css`** | Floating WhatsApp contact button component and styling. |
+| **`src/components/FloatingAIAssistant.tsx` / `.css`** | Floating AI Assistant chat popup widget and styling. |
+| **`src/layouts/MainLayout.tsx` / `.css`** | Mounted WhatsApp & AI buttons; role-based sidebar (`Student` vs Staff/SuperAdmin); unread Govt. Updates badge; removed `Online Services` and `Net Cafe`. |
+| **`src/App.tsx`** | Route protection rules with `allowedRoles`, `/student-dashboard`, `/change-password`, `/courses`, and `/govt-updates`. |
+| **`CoursesController.cs` / `Courses.tsx` / `courseService.ts`** | Courses Management backend API, database table, and frontend UI. |
+| **`GovernmentUpdatesController.cs` / `GovtUpdates.tsx` / `govtUpdateService.ts`** | Government Updates backend API, attachments, database table, and frontend UI. |
+| **`StudentPortalController.cs` / `StudentDashboard.tsx` / `ChangePassword.tsx`** | Student Portal API, student dashboard UI, and first-login password change flow. |
 | **`start-all.bat`** | 1-click batch launcher to start API and Client side-by-side. |
 
 ---
 
-## 6. How to Run Your Project
+## 11. How to Run Your Project
 
 ### Option A: From Microsoft Visual Studio
 1. Open **`ICEComputer.sln`** in Visual Studio.

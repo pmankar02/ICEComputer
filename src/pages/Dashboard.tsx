@@ -1,8 +1,9 @@
 
 import "./Dashboard.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config/apiConfig";
+import { useTheme } from "../context/ThemeContext";
 import {
   getGovernmentUpdates,
   getReadUpdateIds,
@@ -34,6 +35,9 @@ const monthlyFees = [
 
 function Dashboard() {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+  const adminMenuRef = useRef<HTMLDivElement>(null);
   const [govtUpdates, setGovtUpdates] = useState<GovernmentUpdate[]>([]);
   const [readUpdateIds, setReadUpdateIds] = useState<number[]>(() =>
     getReadUpdateIds()
@@ -270,7 +274,7 @@ setInactiveStudents(
       },
       {
         title: "Pending Fees",
-       value: `₹${pendingFees.toLocaleString("en-IN", {
+        value: `₹${pendingFees.toLocaleString("en-IN", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })}`,
@@ -280,7 +284,68 @@ setInactiveStudents(
       },
     ];
 
+  let displayName = "Admin";
+  let displayRole = "Administrator";
+  let isSuperAdmin = false;
 
+  try {
+    const storedUser = localStorage.getItem("user");
+    const parsed = storedUser ? JSON.parse(storedUser) : null;
+    if (parsed) {
+      displayName =
+        parsed.fullName || parsed.name || parsed.userName || parsed.mobile || "Admin";
+      const roles: string[] = Array.isArray(parsed.roles)
+        ? parsed.roles
+        : parsed.role
+          ? [parsed.role]
+          : [];
+      if (roles.length > 0) {
+        displayRole = roles[0];
+        isSuperAdmin = roles.some((r) => r.toLowerCase() === "superadmin");
+      }
+    }
+  } catch {
+    // Keep defaults
+  }
+
+  const unreadCount = govtUpdates.filter((u) =>
+    isUpdateUnread(u, readUpdateIds)
+  ).length;
+
+  useEffect(() => {
+    if (!adminMenuOpen) return;
+
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (
+        adminMenuRef.current &&
+        !adminMenuRef.current.contains(event.target as Node)
+      ) {
+        setAdminMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setAdminMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [adminMenuOpen]);
+
+  const handleLogout = () => {
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (!confirmLogout) return;
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setAdminMenuOpen(false);
+    navigate("/login", { replace: true });
+  };
 
   return (
     <div className="dashboard-layout">
@@ -362,25 +427,111 @@ setInactiveStudents(
         <header className="topbar">
           <div>
             <h1>Dashboard</h1>
-            <p>Welcome back, Admin!</p>
+            <p>Welcome back, {displayName}!</p>
           </div>
 
           <div className="admin-profile">
             <button
-              className="notification-button"
-              aria-label="Notifications"
-              onClick={() => alert("Notifications will be added later.")}
+              type="button"
+              className="theme-toggle-button"
+              aria-label={
+                theme === "dark"
+                  ? "Switch to Light Mode"
+                  : "Switch to Dark Mode"
+              }
+              title={
+                theme === "dark"
+                  ? "Switch to Light Mode"
+                  : "Switch to Dark Mode"
+              }
+              onClick={toggleTheme}
             >
-              <i className="bi bi-bell"></i>
+              <i
+                className={
+                  theme === "dark" ? "bi bi-sun-fill" : "bi bi-moon-fill"
+                }
+              ></i>
             </button>
 
-            <div className="admin-avatar">
-              <i className="bi bi-person-fill"></i>
-            </div>
+            <button
+              type="button"
+              className="notification-button"
+              aria-label="Notifications"
+              title="View Government Updates"
+              onClick={() => navigate("/govt-updates")}
+            >
+              <i className="bi bi-bell"></i>
+              {unreadCount > 0 && (
+                <span className="notification-badge">{unreadCount}</span>
+              )}
+            </button>
 
-            <div>
-              <strong>Admin</strong>
-              <small>Administrator</small>
+            <div className="admin-profile-wrapper" ref={adminMenuRef}>
+              <button
+                type="button"
+                className="admin-profile-trigger"
+                aria-expanded={adminMenuOpen}
+                aria-haspopup="menu"
+                onClick={() => setAdminMenuOpen((prev) => !prev)}
+              >
+                <div className="admin-avatar">
+                  <i className="bi bi-person-fill"></i>
+                </div>
+
+                <div className="admin-identity">
+                  <strong>{displayName}</strong>
+                  <small>{displayRole}</small>
+                </div>
+
+                <i className="bi bi-chevron-down admin-chevron"></i>
+              </button>
+
+              {adminMenuOpen && (
+                <div className="admin-dropdown" role="menu">
+                  <div className="admin-dropdown-header">
+                    <strong>{displayName}</strong>
+                    <small>{displayRole}</small>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="admin-dropdown-item"
+                    role="menuitem"
+                    onClick={() => {
+                      setAdminMenuOpen(false);
+                      navigate("/change-password");
+                    }}
+                  >
+                    <i className="bi bi-key"></i>
+                    <span>Change Password</span>
+                  </button>
+
+                  {isSuperAdmin && (
+                    <button
+                      type="button"
+                      className="admin-dropdown-item"
+                      role="menuitem"
+                      onClick={() => {
+                        setAdminMenuOpen(false);
+                        navigate("/user-management");
+                      }}
+                    >
+                      <i className="bi bi-person-gear"></i>
+                      <span>Users &amp; Roles</span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    className="admin-dropdown-item danger"
+                    role="menuitem"
+                    onClick={handleLogout}
+                  >
+                    <i className="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>

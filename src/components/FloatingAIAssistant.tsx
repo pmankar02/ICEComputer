@@ -244,12 +244,14 @@ const FloatingAIAssistant: React.FC = () => {
         </div>
       )}
 
-      {/* Floating Pill Button (WhatsApp-like Style) */}
+      {/* Floating Circular AI Assistant Button */}
       <button
         type="button"
         className={`floating-ai-pill-btn ${isOpen ? "is-open" : ""}`}
         onClick={() => setIsOpen(!isOpen)}
-        aria-label="Toggle AI Assistant"
+        aria-label={isOpen ? "Close AI Assistant" : "Open AI Assistant"}
+        title={isOpen ? "Close AI Assistant" : "AI Assistant"}
+        data-tooltip={isOpen ? "Close AI Assistant" : "AI Assistant"}
       >
         <span className="floating-ai-pill-icon-wrapper">
           {isOpen ? (
@@ -259,12 +261,8 @@ const FloatingAIAssistant: React.FC = () => {
           )}
         </span>
 
-        <span className="floating-ai-pill-text">
-          {isOpen ? "Close AI" : "AI Assistant"}
-        </span>
-
         {!isOpen && (
-          <span className="floating-ai-pill-badge" title="AI Assistant Available">
+          <span className="floating-ai-pill-badge" aria-hidden="true">
             {hasUnread ? "1" : "✨"}
           </span>
         )}

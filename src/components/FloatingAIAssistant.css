@@ -3,40 +3,69 @@
    (Positioned neatly above the WhatsApp Chat button)
    ========================================================= */
 
-/* --- Floating Pill Button --- */
+/* --- Floating Circular AI Button --- */
 .floating-ai-pill-btn {
   position: fixed;
-  bottom: 80px;
+  bottom: 92px;
   right: 24px;
   z-index: 9999;
+  width: 54px;
+  height: 54px;
+  padding: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 18px;
+  justify-content: center;
   background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
   color: #ffffff;
   border: none;
-  border-radius: 9999px;
+  border-radius: 50%;
   box-shadow: 0 8px 24px rgba(79, 70, 229, 0.38), 0 2px 6px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.25s ease;
   user-select: none;
 }
 
 .floating-ai-pill-btn:hover {
-  transform: translateY(-3px) scale(1.02);
+  transform: translateY(-3px) scale(1.06);
   box-shadow: 0 12px 28px rgba(79, 70, 229, 0.5), 0 4px 10px rgba(0, 0, 0, 0.12);
   background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 50%, #6d28d9 100%);
 }
 
 .floating-ai-pill-btn:active {
-  transform: translateY(0) scale(0.98);
+  transform: translateY(0) scale(0.96);
 }
 
 .floating-ai-pill-btn.is-open {
   background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
   box-shadow: 0 8px 20px rgba(31, 41, 55, 0.35);
+}
+
+/* Hover Tooltip */
+.floating-ai-pill-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%) translateX(4px);
+  padding: 6px 11px;
+  border-radius: 8px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.floating-ai-pill-btn:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
 }
 
 .floating-ai-pill-icon-wrapper {
@@ -45,30 +74,26 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  font-size: 18px;
+  font-size: 23px;
   color: #ffffff;
 }
 
-.floating-ai-pill-text {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-  white-space: nowrap;
-}
-
 .floating-ai-pill-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 5px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
   background: #ffffff;
   color: #4f46e5;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   border-radius: 9999px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   animation: floating-ai-badge-pulse 2s infinite;
 }
 
@@ -84,7 +109,7 @@
 /* --- Floating AI Chat Window --- */
 .floating-ai-window {
   position: fixed;
-  bottom: 138px;
+  bottom: 160px;
   right: 24px;
   z-index: 9999;
   width: 390px;
@@ -424,18 +449,26 @@
 /* Responsive */
 @media (max-width: 600px) {
   .floating-ai-pill-btn {
-    bottom: 66px;
+    bottom: 76px;
     right: 16px;
-    padding: 8px 14px;
-    font-size: 13px;
+    width: 48px;
+    height: 48px;
   }
 
-  .floating-ai-pill-text {
-    font-size: 13px;
+  .floating-ai-pill-icon-wrapper {
+    width: 24px;
+    height: 24px;
+    font-size: 20px;
+  }
+
+  .floating-ai-pill-badge {
+    min-width: 18px;
+    height: 18px;
+    font-size: 10px;
   }
 
   .floating-ai-window {
-    bottom: 120px;
+    bottom: 136px;
     right: 12px;
     left: 12px;
     width: auto;

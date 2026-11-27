@@ -23,16 +23,15 @@ const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({
       rel="noopener noreferrer"
       className="floating-whatsapp-pill-btn"
       aria-label="Chat on WhatsApp"
-      title="Chat with us on WhatsApp"
+      title="Chat on WhatsApp"
+      data-tooltip="Chat on WhatsApp"
     >
       <span className="floating-whatsapp-icon-wrapper">
         <i className="bi bi-whatsapp"></i>
       </span>
 
-      <span className="floating-whatsapp-text">WhatsApp Chat</span>
-
       {badgeCount && (
-        <span className="floating-whatsapp-badge" title="Notifications">
+        <span className="floating-whatsapp-badge" aria-hidden="true">
           {badgeCount}
         </span>
       )}
