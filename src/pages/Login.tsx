@@ -57,7 +57,20 @@ function Login() {
         }),
       });
 
-      const result = await response.json();
+      const rawText = await response.text();
+      let result: Partial<LoginResponse> & { message?: string } = {};
+
+      if (rawText) {
+        try {
+          result = JSON.parse(rawText);
+        } catch {
+          throw new Error(
+            response.ok
+              ? "Unexpected response from server."
+              : `Server error (${response.status}). Please check backend and database connection.`
+          );
+        }
+      }
 
       if (!response.ok) {
         throw new Error(

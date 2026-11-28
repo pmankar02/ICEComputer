@@ -27,7 +27,8 @@ html[data-theme="dark"] .insights-page,
 html[data-theme="dark"] .ai-page,
 html[data-theme="dark"] .user-management,
 html[data-theme="dark"] .student-portal,
-html[data-theme="dark"] .reports-page {
+html[data-theme="dark"] .reports-page,
+html[data-theme="dark"] .settings-page {
   background: #0b1120;
   color: #e2e8f0;
 }
@@ -204,11 +205,20 @@ html[data-theme="dark"] .reports-filter-card,
 html[data-theme="dark"] .reports-summary-card,
 html[data-theme="dark"] .reports-breakdown-card,
 html[data-theme="dark"] .reports-table-card,
-html[data-theme="dark"] .reports-chip {
+html[data-theme="dark"] .reports-chip,
+html[data-theme="dark"] .settings-card,
+html[data-theme="dark"] .settings-logo-row {
   background: #131c31;
   border-color: #1e293b;
   color: #e2e8f0;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"] .settings-tab-btn:not(.active),
+html[data-theme="dark"] .settings-btn-secondary {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-color: #334155;
 }
 
 html[data-theme="dark"] .reports-category-card.active {

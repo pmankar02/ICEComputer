@@ -73,6 +73,10 @@ function MainLayout() {
     (role) => role.toLowerCase() === "superadmin"
   );
 
+  const isAdminOrSuperAdmin = userRoles.some((role) =>
+    ["superadmin", "adminstaff"].includes(role.toLowerCase())
+  );
+
   const isStudentOnly =
     userRoles.some((role) => role.toLowerCase() === "student") &&
     !userRoles.some((role) =>
@@ -90,6 +94,10 @@ function MainLayout() {
     : menuItems.filter((item) => {
         if (item.label === "Fees" || item.label === "Users & Roles") {
           return isSuperAdmin;
+        }
+
+        if (item.label === "Settings") {
+          return isAdminOrSuperAdmin;
         }
 
         return true;

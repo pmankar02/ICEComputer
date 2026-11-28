@@ -22,6 +22,7 @@ import GovtUpdates from "./pages/GovtUpdates";
 import ChangePassword from "./pages/ChangePassword";
 import StudentDashboard from "./pages/StudentDashboard";
 import Reports from "./pages/Reports";
+import Settings from "./pages/Settings";
 
 // Check whether JWT token exists and is valid by expiry
 function isTokenValid(): boolean {
@@ -233,6 +234,14 @@ function App() {
                 allowedRoles={["SuperAdmin", "AdminStaff", "Faculty", "Student"]}
               >
                 <Reports />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute allowedRoles={["SuperAdmin", "AdminStaff"]}>
+                <Settings />
               </ProtectedRoute>
             }
           />
